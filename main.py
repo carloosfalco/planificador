@@ -1,5 +1,5 @@
 import streamlit as st
-from asignacion_cargas import asignacion_cargas
+from asignacion_cargas import mostrar_asignacion_cargas
 from rutas import planificador_rutas
 
 st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
@@ -9,4 +9,4 @@ menu = st.sidebar.radio("📂 Selecciona una funcionalidad:", ["📍 Planificado
 if menu == "📍 Planificador de rutas":
     planificador_rutas()
 elif menu == "🚚 Asignación de cargas":
-    asignacion_cargas()
+   mostrar_asignacion_cargas()

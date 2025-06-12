@@ -6,6 +6,7 @@ def generar_orden_carga():
     st.markdown("Completa los siguientes datos para generar una orden clara y profesional.")
 
     with st.form("orden_form"):
+        chofer = st.text_input("Nombre del chofer")
         cliente = st.text_input("Cliente")
         origen = st.text_input("Origen")
         destino = st.text_input("Destino")
@@ -19,7 +20,7 @@ def generar_orden_carga():
 
     if submitted:
         mensaje = f"""
-Hola, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
+Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
 
 🚚 Cliente: {cliente}
 📍 Origen: {origen}
@@ -40,3 +41,4 @@ Hola, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
         st.markdown("### ✉️ Orden generada:")
         st.code(mensaje, language="markdown")
         st.success("✅ Orden generada con éxito.")
+

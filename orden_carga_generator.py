@@ -7,14 +7,13 @@ def generar_orden_carga():
 
     with st.form("orden_form"):
         chofer = st.text_input("Nombre del chofer")
-        
+        fecha_carga = st.date_input("📅 Fecha de carga", value=date.today())
         num_origenes = st.number_input("Número de ubicaciones de carga", min_value=1, max_value=5, value=1)
         origenes = [st.text_input(f"📍 Origen {i+1}") for i in range(num_origenes)]
 
         num_destinos = st.number_input("Número de ubicaciones de descarga", min_value=1, max_value=5, value=1)
         destinos = [st.text_input(f"🎯 Destino {i+1}") for i in range(num_destinos)]
 
-        fecha_carga = st.date_input("📅 Fecha de carga", value=date.today())
         hora_carga = st.time_input("🕒 Hora de carga")
         hora_descarga = st.text_input("🕓 Hora de descarga")
         tipo_mercancia = st.text_input("📦 Tipo de mercancía (opcional)")

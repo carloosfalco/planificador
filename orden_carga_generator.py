@@ -13,14 +13,14 @@ def generar_orden_carga():
         num_origenes = st.number_input("Número de ubicaciones de carga", min_value=1, max_value=5, value=1)
         origenes = []
         for i in range(num_origenes):
-            origen = st.text_input(f"📍 Origen {i+1}")
+            origen = st.text_input(f"📍 Origen {i+1}", key=f"origen_{i}")
             hora_carga = st.time_input(f"🕒 Hora de carga Origen {i+1}", key=f"hora_carga_{i}")
             origenes.append((origen, hora_carga))
 
         num_destinos = st.number_input("Número de ubicaciones de descarga", min_value=1, max_value=5, value=1)
         destinos = []
         for i in range(num_destinos):
-            destino = st.text_input(f"🎯 Destino {i+1}")
+            destino = st.text_input(f"🎯 Destino {i+1}", key=f"destino_{i}")
             hora_descarga = st.text_input(f"🕓 Hora de descarga Destino {i+1}", key=f"hora_descarga_{i}")
             ref_cliente = st.text_input(f"📌 Referencia cliente Destino {i+1}", key=f"ref_cliente_{i}")
             destinos.append((destino, hora_descarga, ref_cliente))
@@ -31,15 +31,12 @@ def generar_orden_carga():
         submitted = st.form_submit_button("Generar orden")
 
     if submitted:
-        mensaje = f"""Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
+        mensaje = f"Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:\n\n"
+        mensaje += f"🔐 Ref. interna: {ref_interna}\n\n📍 Cargas:\n"
 
-🔐 Ref. interna: {ref_interna}
-
-📍 Cargas:
-"""
         for i, (origen, hora) in enumerate(origenes):
             if origen.strip():
-                mensaje += f"  - Origen {i+1}: {origen} ( {hora.strftime('%H:%M')}H)\n"
+                mensaje += f"  - Origen {i+1}: {origen} ({hora.strftime('%H:%M')}H)\n"
 
         mensaje += "\n🎯 Descargas:\n"
         for i, (destino, hora_descarga, ref) in enumerate(destinos):
@@ -53,24 +50,15 @@ def generar_orden_carga():
             mensaje += f"\n\n📌 {observaciones.strip()}"
 
         mensaje += "\n\nPor favor, avisa de inmediato si surge algún problema o hay riesgo de retraso."
-
         mensaje = mensaje.strip()
 
         st.markdown("### ✉️ Orden generada:")
         st.text_area("Mensaje generado", mensaje, height=350, key="mensaje_generado")
 
-        # Botón copiar
-        copy_js = f"""
-            <script>
-            function copyToClipboard(text) {{
-                navigator.clipboard.writeText(text).then(function() {{
-                    alert("📋 Mensaje copiado al portapapeles.");
-                }}, function(err) {{
-                    alert("❌ Error al copiar el mensaje.");
-                }});
-            }}
-            </script>
-            <button onclick="copyToClipboard(`{mensaje}`)">📋 Copiar mensaje</button>
-        """
-        st.markdown(copy_js, unsafe_allow_html=True)
-        st.success("✅ Orden generada con éxito.")
+        # Botón de copiar usando native Streamlit clipboard feature (solo desde versión 1.25 en adelante)
+        st.download_button(
+            label="📋 Copiar / Descargar orden",
+            data=mensaje,
+            file_name=f"orden_carga_{fecha_carga.strftime('%d%m%Y')}.txt",
+            mime="text/plain"
+        )

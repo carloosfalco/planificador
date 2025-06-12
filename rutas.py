@@ -33,6 +33,17 @@ def planificador_rutas():
         </style>
     """, unsafe_allow_html=True)
 
+    # Logo y títulos alineados a la izquierda
+    logo = Image.open("logo-virosque2-01.png")
+    col_logo, col_text = st.columns([1, 6])
+    with col_logo:
+        st.image(logo, width=150)
+    with col_text:
+        st.markdown("""
+            <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
+            <p style='font-size: 18px; color: white; margin-top: 0;'>Planificador de rutas para camiones</p>
+        """, unsafe_allow_html=True)
+
     # Inputs
     col1, col2, col3 = st.columns(3)
     with col1:

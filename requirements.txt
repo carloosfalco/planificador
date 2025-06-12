@@ -8,3 +8,4 @@ openpyxl
 geopy
 pandas
 openai
+transformers torch

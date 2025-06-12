@@ -38,16 +38,5 @@ Hola, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
         mensaje = mensaje.strip()
 
         st.markdown("### ✉️ Orden generada:")
-        st.text_area("Mensaje", value=mensaje, height=300, key="orden_texto")
-
-        # Botón para copiar (con JavaScript)
-        copy_code = f"""
-        <button onclick="navigator.clipboard.writeText(document.getElementById('orden_texto').value)"
-                style="background-color:#8D1B2D;color:white;border:none;padding:0.6em 1.2em;
-                       border-radius:6px;font-weight:bold;cursor:pointer;margin-top:10px;">
-            📋 Copiar orden al portapapeles
-        </button>
-        """
-        st.markdown(copy_code, unsafe_allow_html=True)
-
+        st.code(mensaje, language="markdown")
         st.success("✅ Orden generada con éxito.")

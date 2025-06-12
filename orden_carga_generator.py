@@ -47,5 +47,4 @@ def generar_orden_carga():
         # Mostrar mensaje con botón de copia nativo
         st.markdown("### ✉️ Orden generada:")
         st.code(mensaje, language="markdown")
-        st.success("✅ Orden generada con éxito")
-
+        st.success("✅ Copia el mensaje con el botón superior para enviarlo al transportista.")

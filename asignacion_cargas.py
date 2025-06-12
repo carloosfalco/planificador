@@ -1,6 +1,6 @@
 import streamlit as st
 
-def mostrar_asignacion_cargas():
+def asignacion_cargas():
     st.title("🚚 Asignación de Cargas")
 
     st.sidebar.header("Filtros")

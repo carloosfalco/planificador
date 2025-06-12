@@ -1,21 +1,27 @@
 import streamlit as st
-from asignacion_cargas import asignacion_cargas
 from rutas import planificador_rutas
+from asignacion_cargas import asignacion_cargas
+from planificacion_cargas import planificacion
 from orden_carga_generator import generar_orden_carga
 
 # Configuración de la página
 st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
 
-# Menú lateral
-opcion = st.sidebar.selectbox("Selecciona una funcionalidad", [
+# Menú lateral con botones directos
+st.sidebar.title("📋 Menú")
+seccion = st.sidebar.radio("Selecciona una sección:", [
+    "Planificador de Rutas",
     "Asignación de Cargas",
-    "Planificador de Rutas"
+    "Planificación Óptima",
+    "Orden de Carga"
 ])
 
-# Mostrar la funcionalidad correspondiente
-if opcion == "Asignación de Cargas":
-    asignacion_cargas()
-elif opcion == "Planificador de Rutas":
+# Mostrar la sección seleccionada
+if seccion == "Planificador de Rutas":
     planificador_rutas()
-elif opcion == "Orden de Carga":
+elif seccion == "Asignación de Cargas":
+    asignacion_cargas()
+elif seccion == "Planificación Óptima":
+    planificacion()
+elif seccion == "Orden de Carga":
     generar_orden_carga()

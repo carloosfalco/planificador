@@ -7,29 +7,36 @@ def generar_orden_carga():
 
     with st.form("orden_form"):
         chofer = st.text_input("Nombre del chofer")
-        fecha_carga = st.date_input("📅 Fecha de carga", value=date.today())
+        ref_interna = st.text_input("Referencia interna")
+
         num_origenes = st.number_input("Número de ubicaciones de carga", min_value=1, max_value=5, value=1)
-        origenes = [st.text_input(f"📍 Origen {i+1}") for i in range(num_origenes)]
+        origenes = []
+        for i in range(num_origenes):
+            origen = st.text_input(f"📍 Origen {i+1}")
+            hora_carga = st.time_input(f"🕒 Hora de carga Origen {i+1}", key=f"hora_carga_{i}")
+            origenes.append((origen, hora_carga))
 
         num_destinos = st.number_input("Número de ubicaciones de descarga", min_value=1, max_value=5, value=1)
-        destinos = [st.text_input(f"🎯 Destino {i+1}") for i in range(num_destinos)]
+        destinos = []
+        for i in range(num_destinos):
+            destino = st.text_input(f"🎯 Destino {i+1}")
+            ref_cliente = st.text_input(f"Referencia cliente Destino {i+1}", key=f"ref_dest_{i}")
+            hora_descarga = st.text_input(f"🕓 Hora de descarga Destino {i+1}", key=f"hora_desc_{i}")
+            destinos.append((destino, ref_cliente, hora_descarga))
 
-        hora_carga = st.time_input("🕒 Hora de carga")
-        hora_descarga = st.text_input("🕓 Hora de descarga")
+        fecha_carga = st.date_input("📅 Fecha de carga", value=date.today())
         tipo_mercancia = st.text_input("📦 Tipo de mercancía (opcional)")
         observaciones = st.text_area("📝 Observaciones (opcional)")
 
         submitted = st.form_submit_button("Generar orden")
 
     if submitted:
-        mensaje = f"""
-Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
-
-⏱ Hora de carga: {hora_carga.strftime('%H:%M')}
-📥 Hora de descarga: {hora_descarga}
-
-📍 Origen:
-""" + "\n".join([f"  - {origen}" for origen in origenes if origen.strip()]) + "\n\n🎯 Destino:\n" + "\n".join([f"  - {destino}" for destino in destinos if destino.strip()])
+        mensaje = f"Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:\n\n"
+        mensaje += f"🧾 Referencia interna: {ref_interna}\n\n"
+        mensaje += "📍 Origen(es):\n" + "\n".join([f"  - {ori} a las {hora.strftime('%H:%M')}" for ori, hora in origenes])
+        mensaje += "\n\n🎯 Destino(s):\n" + "\n".join([
+            f"  - {dest} (Ref: {ref}) a las {hora_desc}" for dest, ref, hora_desc in destinos if dest.strip()
+        ])
 
         if tipo_mercancia.strip():
             mensaje += f"\n\n📦 Tipo de mercancía: {tipo_mercancia.strip()}"
@@ -39,14 +46,10 @@ Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/
 
         mensaje += "\n\nPor favor, avisa de inmediato si surge algún problema o hay riesgo de retraso."
 
-        mensaje = mensaje.strip()
-
         st.markdown("### ✉️ Orden generada:")
+        st.text_area("Mensaje generado", mensaje, height=300)
         st.code(mensaje, language="markdown")
-        st.success("✅ Orden generada con éxito.")
-   
 
-# Para incluir en tu main.py:
-# from orden_carga_generator import generar_orden_carga
-# generar_orden_carga()
+generar_orden_carga()
+
 

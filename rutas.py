@@ -30,23 +30,18 @@ def planificador_rutas():
                 background-color: #a7283d;
                 color: white;
             }
-            .titulo-seccion h1, .titulo-seccion p {
-                text-align: left;
-            }
         </style>
     """, unsafe_allow_html=True)
 
-    # Logo y título
+    # Logo y título alineados a la izquierda
     logo = Image.open("logo-virosque2-01.png")
     col_logo, col_title = st.columns([1, 5])
     with col_logo:
         st.image(logo, width=150)
     with col_title:
         st.markdown("""
-            <div class='titulo-seccion'>
-                <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
-                <p style='font-size: 18px; color: white; margin-top: 0;'>Planificador de rutas para camiones</p>
-            </div>
+            <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
+            <p style='font-size: 20px; color: white; margin-top: 0;'>Planificador de rutas para camiones</p>
         """, unsafe_allow_html=True)
 
     # Inputs
@@ -172,3 +167,4 @@ def geocode(direccion, api_key):
         return coord, label
     else:
         return None, None
+

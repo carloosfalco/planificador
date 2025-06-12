@@ -33,16 +33,11 @@ def planificador_rutas():
         </style>
     """, unsafe_allow_html=True)
 
-    # Logo y títulos alineados a la izquierda
+    # Logo y encabezado alineados a la izquierda
     logo = Image.open("logo-virosque2-01.png")
-    col_logo, col_text = st.columns([1, 6])
-    with col_logo:
-        st.image(logo, width=150)
-    with col_text:
-        st.markdown("""
-            <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
-            <p style='font-size: 18px; color: white; margin-top: 0;'>Planificador de rutas para camiones</p>
-        """, unsafe_allow_html=True)
+    st.image(logo, width=250)
+    st.markdown("<h1 style='color:#8D1B2D; text-align: left;'>TMS</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='color:white; font-size: 18px; text-align: left;'>Planificador de rutas para camiones</p>", unsafe_allow_html=True)
 
     # Inputs
     col1, col2, col3 = st.columns(3)
@@ -53,12 +48,12 @@ def planificador_rutas():
     with col3:
         hora_salida_str = st.time_input("🕒 Hora de salida", value=datetime.strptime("08:00", "%H:%M")).strftime("%H:%M")
 
-    # Paradas
+    # Paradas intermedias
     stops = st.text_area("➕ Paradas intermedias (una por línea)", placeholder="Ej: Albacete, España\nCuenca, España")
 
-    # Botón
+    # Botón para calcular
     if st.button("🔍 Calcular Ruta"):
-        st.session_state.resultados = None
+        st.session_state["resultados"] = None
 
         coord_origen, _ = geocode(origen, api_key)
         coord_destino, _ = geocode(destino, api_key)
@@ -88,7 +83,6 @@ def planificador_rutas():
             st.error(f"❌ Error al calcular la ruta: {e}")
             return
 
-        # Resultados
         segmentos = ruta['features'][0]['properties']['segments']
         distancia_total = sum(seg["distance"] for seg in segmentos)
         duracion_total = sum(seg["duration"] for seg in segmentos)
@@ -110,8 +104,7 @@ def planificador_rutas():
         tiempo_conduccion_txt = horas_y_minutos(duracion_horas)
         tiempo_total_txt = horas_y_minutos(tiempo_total_h)
 
-        # Guardar resultados
-        st.session_state.resultados = {
+        st.session_state["resultados"] = {
             "distancia_km": distancia_km,
             "tiempo_conduccion_txt": tiempo_conduccion_txt,
             "tiempo_total_txt": tiempo_total_txt,
@@ -123,32 +116,29 @@ def planificador_rutas():
             "coord_destino": coord_destino
         }
 
-    # Mostrar si hay resultados guardados
-    if "resultados" in st.session_state and st.session_state.resultados:
-        r = st.session_state.resultados
+    if "resultados" in st.session_state and st.session_state["resultados"]:
+        r = st.session_state["resultados"]
 
-        # Métricas
         st.markdown("### 📊 Datos de la ruta")
         col1, col2, col3, col4 = st.columns(4)
-        col1.metric("🚣 Distancia", f"{r['distancia_km']:.2f} km")
+        col1.metric("🛣 Distancia", f"{r['distancia_km']:.2f} km")
         col2.metric("🕓 Conducción", r['tiempo_conduccion_txt'])
         col3.metric("⏱ Total (con descansos)", r['tiempo_total_txt'])
         col4.metric("📅 Llegada estimada", r['hora_llegada'])
 
         if r['tiempo_total_real_h'] > 13:
-            st.warning(f"⚠️ El viaje excede la jornada máxima (13h). Se ha añadido un descanso obligatorio de 11h.")
+            st.warning("⚠️ El viaje excede la jornada máxima (13h). Se ha añadido un descanso obligatorio de 11h.")
         else:
             st.success("🟢 El viaje puede completarse en una sola jornada de trabajo.")
 
-        # Mapa
-        linea_latlon = [[p[1], p[0]] for p in r['linea']]
+        linea_latlon = [[p[1], p[0]] for p in r["linea"]]
         m = folium.Map(location=linea_latlon[0], zoom_start=6)
         folium.Marker(location=[r['coord_origen'][1], r['coord_origen'][0]], tooltip="📍 Origen").add_to(m)
-        for idx, parada in enumerate(r['stops_list']):
+        for idx, parada in enumerate(r["stops_list"]):
             folium.Marker(location=[parada[1], parada[0]], tooltip=f"Parada {idx + 1}").add_to(m)
-        folium.Marker(location=[r['coord_destino'][1], r['coord_destino'][0]], tooltip="🏑 Destino").add_to(m)
+        folium.Marker(location=[r['coord_destino'][1], r['coord_destino'][0]], tooltip="🏁 Destino").add_to(m)
         folium.PolyLine(linea_latlon, color="blue", weight=5).add_to(m)
-        st.markdown("### 🗘️ Ruta estimada en mapa:")
+        st.markdown("### 🗺️ Ruta estimada en mapa:")
         st_folium(m, width=1200, height=500)
 
 def geocode(direccion, api_key):
@@ -167,3 +157,4 @@ def geocode(direccion, api_key):
         return coord, label
     else:
         return None, None
+

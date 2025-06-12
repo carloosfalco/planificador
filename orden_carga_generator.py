@@ -3,7 +3,7 @@ from datetime import date
 
 def generar_orden_carga():
     st.title("📦 Generador de Orden de Carga")
-    st.markdown("Completa los siguientes datos para generar una orden clara y profesional.")
+    st.markdown("Completa los siguientes datos para generar una orden.")
 
     with st.form("orden_form"):
         chofer = st.text_input("Nombre del chofer")

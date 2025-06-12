@@ -25,7 +25,6 @@ def generar_orden_carga():
         mensaje = f"""
 Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
 
-
 ⏱ Hora de carga: {hora_carga.strftime('%H:%M')}
 📥 Hora de descarga: {hora_descarga}
 

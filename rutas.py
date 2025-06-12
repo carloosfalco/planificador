@@ -38,7 +38,7 @@ def planificador_rutas():
     col1, col2 = st.columns([1, 2])
     with col1:
         st.image(logo, width=200)
-    with col1:
+    with col2:
         st.markdown("<h1 style='color:#8D1B2D;'>TMS</h1>", unsafe_allow_html=True)
         st.markdown("### Planificador de rutas para camiones", unsafe_allow_html=True)
 

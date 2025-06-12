@@ -5,3 +5,5 @@ pillow
 folium
 streamlit-folium
 openpyxl
+geopy
+pandas

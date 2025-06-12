@@ -53,5 +53,5 @@ def generar_orden_carga():
         mensaje = mensaje.strip()
 
         st.markdown("### ✉️ Orden generada:")
-       st.code(mensaje, language="markdown")
+        st.code(mensaje, language="markdown")
 

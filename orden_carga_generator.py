@@ -39,7 +39,7 @@ def generar_orden_carga():
 """
         for i, (origen, hora) in enumerate(origenes):
             if origen.strip():
-                mensaje += f"  - Origen {i+1}: {origen} (Hora: {hora.strftime('%H:%M')})\n"
+                mensaje += f"  - Origen {i+1}: {origen} (Hora: {strftime('%H:%M')},H)\n"
 
         mensaje += "\n🎯 Descargas:\n"
         for i, (destino, hora_descarga, ref) in enumerate(destinos):

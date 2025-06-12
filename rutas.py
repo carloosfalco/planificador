@@ -35,12 +35,15 @@ def planificador_rutas():
 
     # Logo y título
     logo = Image.open("logo-virosque2-01.png")
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        st.image(logo, width=200)
-    with col1:
-        st.markdown("<h1 style='color:#8D1B2D;'>TMS</h1>", unsafe_allow_html=True)
-        st.markdown("### Planificador de rutas para camiones", unsafe_allow_html=True)
+  col_logo, col_title = st.columns([1, 5])
+with col_logo:
+    st.image(logo, width=150)
+with col_title:
+    st.markdown("""
+        <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
+        <p style='font-size: 18px; color: #333; margin-top: 0;'>Planificador de rutas para camiones</p>
+    """, unsafe_allow_html=True)
+
 
     # Inputs
     col1, col2, col3 = st.columns(3)

@@ -29,14 +29,12 @@ Hola, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
 """
 
         if tipo_mercancia.strip():
-            mensaje += f"📦 Tipo de mercancía: {tipo_mercancia}\n"
+            mensaje += f"📦 Tipo de mercancía: {tipo_mercancia.strip()}\n"
 
         if observaciones.strip():
-            mensaje += f"\n📌 Observaciones: {observaciones.strip()}"
-        else:
-            mensaje += "\n📌 Sin observaciones adicionales."
+            mensaje += f"\n📌 {observaciones.strip()}"
 
-        mensaje += "\n\nPor favor, confirma la recepción y disponibilidad lo antes posible."
+        mensaje += "\n\nPor favor, avisa de inmediato si surge algún problema o hay riesgo de retraso."
 
         st.markdown("### ✉️ Orden generada:")
         st.text_area("Mensaje", value=mensaje.strip(), height=300)

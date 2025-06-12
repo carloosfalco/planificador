@@ -47,7 +47,7 @@ def planificador_rutas():
     with col1:
         origen = st.text_input("📍 Origen", value="Valencia, España")
     with col2:
-        destino = st.text_input("🏑 Destino", value="Madrid, España")
+        destino = st.text_input("🏁 Destino", value="Madrid, España")
     with col3:
         hora_salida_str = st.time_input("🕒 Hora de salida", value=datetime.strptime("08:00", "%H:%M")).strftime("%H:%M")
 

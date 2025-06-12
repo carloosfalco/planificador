@@ -44,7 +44,7 @@ Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/
 
         st.markdown("### ✉️ Orden generada:")
         st.code(mensaje, language="markdown")
-        st.download_button("📥 Copiar o descargar orden", data=mensaje, file_name="orden_carga.txt")
+   
 
 # Para incluir en tu main.py:
 # from orden_carga_generator import generar_orden_carga

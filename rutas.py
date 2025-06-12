@@ -13,36 +13,25 @@ def planificador_rutas():
     client = openrouteservice.Client(key=api_key)
 
     # Estilo
-    st.markdown("""
-        <style>
-            body {
-                background-color: #f5f5f5;
-            }
-            .stButton>button {
-                background-color: #8D1B2D;
-                color: white;
-                border-radius: 6px;
-                padding: 0.6em 1em;
-                border: none;
-                font-weight: bold;
-            }
-            .stButton>button:hover {
-                background-color: #a7283d;
-                color: white;
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # Logo y título alineados a la izquierda
-    logo = Image.open("logo-virosque2-01.png")
-    col_logo, col_title = st.columns([1, 5])
-    with col_logo:
-        st.image(logo, width=150)
-    with col_title:
-        st.markdown("""
-            <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
-            <p style='font-size: 20px; color: white; margin-top: 0;'>Planificador de rutas para camiones</p>
-        """, unsafe_allow_html=True)
+   st.markdown("""
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .stButton>button {
+            background-color: #8D1B2D;
+            color: white;
+            border-radius: 6px;
+            padding: 0.6em 1em;
+            border: none;
+            font-weight: bold;
+        }
+        .stButton>button:hover {
+            background-color: #a7283d;
+            color: white;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
     # Inputs
     col1, col2, col3 = st.columns(3)

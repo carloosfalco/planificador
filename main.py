@@ -12,7 +12,6 @@ st.sidebar.title("📋 Menú")
 seccion = st.sidebar.radio("Selecciona una sección:", [
     "Planificador de Rutas",
     "Asignación de Cargas",
-    "Planificación Óptima",
     "Orden de Carga"
 ])
 
@@ -21,7 +20,5 @@ if seccion == "Planificador de Rutas":
     planificador_rutas()
 elif seccion == "Asignación de Cargas":
     asignacion_cargas()
-elif seccion == "Planificación Óptima":
-    planificacion()
 elif seccion == "Orden de Carga":
     generar_orden_carga()

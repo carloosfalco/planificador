@@ -27,7 +27,6 @@ Hola, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
 ⏱ Hora de carga: {hora_carga.strftime('%H:%M')}
 📥 Hora de descarga: {hora_descarga}
 """
-
         if tipo_mercancia.strip():
             mensaje += f"📦 Tipo de mercancía: {tipo_mercancia.strip()}\n"
 
@@ -36,6 +35,19 @@ Hola, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
 
         mensaje += "\n\nPor favor, avisa de inmediato si surge algún problema o hay riesgo de retraso."
 
+        mensaje = mensaje.strip()
+
         st.markdown("### ✉️ Orden generada:")
-        st.text_area("Mensaje", value=mensaje.strip(), height=300)
-        st.success("✅ Copia el mensaje para enviarlo al transportista.")
+        st.text_area("Mensaje", value=mensaje, height=300, key="orden_texto")
+
+        # Botón para copiar (con JavaScript)
+        copy_code = f"""
+        <button onclick="navigator.clipboard.writeText(document.getElementById('orden_texto').value)"
+                style="background-color:#8D1B2D;color:white;border:none;padding:0.6em 1.2em;
+                       border-radius:6px;font-weight:bold;cursor:pointer;margin-top:10px;">
+            📋 Copiar orden al portapapeles
+        </button>
+        """
+        st.markdown(copy_code, unsafe_allow_html=True)
+
+        st.success("✅ Orden generada con éxito.")

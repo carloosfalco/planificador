@@ -8,14 +8,23 @@ def generar_orden_carga():
     with st.form("orden_form"):
         chofer = st.text_input("Nombre del chofer")
         fecha_carga = st.date_input("📅 Fecha de carga", value=date.today())
+        ref_interna = st.text_input("🔐 Referencia interna")
+
         num_origenes = st.number_input("Número de ubicaciones de carga", min_value=1, max_value=5, value=1)
-        origenes = [st.text_input(f"📍 Origen {i+1}") for i in range(num_origenes)]
+        origenes = []
+        for i in range(num_origenes):
+            origen = st.text_input(f"📍 Origen {i+1}")
+            hora_carga = st.time_input(f"🕒 Hora de carga Origen {i+1}", key=f"hora_carga_{i}")
+            origenes.append((origen, hora_carga))
 
         num_destinos = st.number_input("Número de ubicaciones de descarga", min_value=1, max_value=5, value=1)
-        destinos = [st.text_input(f"🎯 Destino {i+1}") for i in range(num_destinos)]
+        destinos = []
+        for i in range(num_destinos):
+            destino = st.text_input(f"🎯 Destino {i+1}")
+            hora_descarga = st.text_input(f"🕓 Hora de descarga Destino {i+1}", key=f"hora_descarga_{i}")
+            ref_cliente = st.text_input(f"📌 Referencia cliente Destino {i+1}", key=f"ref_cliente_{i}")
+            destinos.append((destino, hora_descarga, ref_cliente))
 
-        hora_carga = st.time_input("🕒 Hora de carga")
-        hora_descarga = st.text_input("🕓 Hora de descarga")
         tipo_mercancia = st.text_input("📦 Tipo de mercancía (opcional)")
         observaciones = st.text_area("📝 Observaciones (opcional)")
 
@@ -24,37 +33,44 @@ def generar_orden_carga():
     if submitted:
         mensaje = f"""Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
 
-⏱ Hora de carga: {hora_carga.strftime('%H:%M')}
-📥 Hora de descarga: {hora_descarga}
+🔐 Ref. interna: {ref_interna}
 
-📍 Origen:
-""" + "\n".join([f"  - {origen}" for origen in origenes if origen.strip()]) + "\n\n🎯 Destino:\n" + "\n".join([f"  - {destino}" for destino in destinos if destino.strip()])
+📍 Cargas:"
+"""
+        for i, (origen, hora) in enumerate(origenes):
+            if origen.strip():
+                mensaje += f"  - Origen {i+1}: {origen} (Hora: {hora.strftime('%H:%M')})\n"
+
+        mensaje += "\n🎯 Descargas:\n"
+        for i, (destino, hora_descarga, ref) in enumerate(destinos):
+            if destino.strip():
+                mensaje += f"  - Destino {i+1}: {destino} (Hora: {hora_descarga}, Ref. cliente: {ref})\n"
 
         if tipo_mercancia.strip():
-            mensaje += f"\n\n📦 Tipo de mercancía: {tipo_mercancia.strip()}"
+            mensaje += f"\n📦 Tipo de mercancía: {tipo_mercancia.strip()}"
 
         if observaciones.strip():
             mensaje += f"\n\n📌 {observaciones.strip()}"
 
         mensaje += "\n\nPor favor, avisa de inmediato si surge algún problema o hay riesgo de retraso."
+
         mensaje = mensaje.strip()
 
         st.markdown("### ✉️ Orden generada:")
-        st.text_area("Mensaje generado", mensaje, height=300, key="mensaje_generado")
+        st.text_area("Mensaje generado", mensaje, height=350, key="mensaje_generado")
 
-        # Botón de copiar con JavaScript
+        # Botón copiar
         copy_js = f"""
             <script>
             function copyToClipboard(text) {{
                 navigator.clipboard.writeText(text).then(function() {{
-                    console.log('Texto copiado al portapapeles');
+                    alert("📋 Mensaje copiado al portapapeles.");
                 }}, function(err) {{
-                    console.error('Error al copiar:', err);
+                    alert("❌ Error al copiar el mensaje.");
                 }});
             }}
             </script>
             <button onclick="copyToClipboard(`{mensaje}`)">📋 Copiar mensaje</button>
         """
-
         st.markdown(copy_js, unsafe_allow_html=True)
         st.success("✅ Orden generada con éxito.")

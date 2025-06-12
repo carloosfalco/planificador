@@ -13,25 +13,25 @@ def planificador_rutas():
     client = openrouteservice.Client(key=api_key)
 
     # Estilo
-   st.markdown("""
-    <style>
-        body {
-            background-color: #f5f5f5;
-        }
-        .stButton>button {
-            background-color: #8D1B2D;
-            color: white;
-            border-radius: 6px;
-            padding: 0.6em 1em;
-            border: none;
-            font-weight: bold;
-        }
-        .stButton>button:hover {
-            background-color: #a7283d;
-            color: white;
-        }
-    </style>
-""", unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+            body {
+                background-color: #f5f5f5;
+            }
+            .stButton>button {
+                background-color: #8D1B2D;
+                color: white;
+                border-radius: 6px;
+                padding: 0.6em 1em;
+                border: none;
+                font-weight: bold;
+            }
+            .stButton>button:hover {
+                background-color: #a7283d;
+                color: white;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
     # Inputs
     col1, col2, col3 = st.columns(3)
@@ -156,4 +156,3 @@ def geocode(direccion, api_key):
         return coord, label
     else:
         return None, None
-

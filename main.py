@@ -6,7 +6,7 @@ st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
 
 menu = st.sidebar.radio("📂 Selecciona una funcionalidad:", ["📍 Planificador de rutas", "🚚 Asignación de cargas"])
 
-if menu == "📍 Planificador de rutas":
-    planificador_rutas()
-elif menu == "🚚 Asignación de cargas":
+if menu == "🚚 Asignación de cargas":
    mostrar_asignacion_cargas()
+elif menu == "📍 Planificador de rutas":
+    planificador_rutas()

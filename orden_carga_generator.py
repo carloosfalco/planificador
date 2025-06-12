@@ -35,7 +35,7 @@ def generar_orden_carga():
 
 🔐 Ref. interna: {ref_interna}
 
-📍 Cargas:"
+📍 Cargas:
 """
         for i, (origen, hora) in enumerate(origenes):
             if origen.strip():

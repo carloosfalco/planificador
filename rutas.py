@@ -30,6 +30,9 @@ def planificador_rutas():
                 background-color: #a7283d;
                 color: white;
             }
+            .titulo-seccion h1, .titulo-seccion p {
+                text-align: left;
+            }
         </style>
     """, unsafe_allow_html=True)
 
@@ -40,8 +43,10 @@ def planificador_rutas():
         st.image(logo, width=150)
     with col_title:
         st.markdown("""
-            <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
-            <p style='font-size: 18px; color: #333; margin-top: 0;'>Planificador de rutas para camiones</p>
+            <div class='titulo-seccion'>
+                <h1 style='color:#8D1B2D; margin-bottom: 0;'>TMS</h1>
+                <p style='font-size: 18px; color: white; margin-top: 0;'>Planificador de rutas para camiones</p>
+            </div>
         """, unsafe_allow_html=True)
 
     # Inputs

@@ -1,7 +1,6 @@
 import streamlit as st
 from rutas import planificador_rutas
 from asignacion_cargas import asignacion_cargas
-from planificacion_cargas import planificacion
 from orden_carga_generator import generar_orden_carga
 
 # Configuración de la página

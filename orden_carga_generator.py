@@ -44,7 +44,7 @@ def generar_orden_carga():
         mensaje += "\n🎯 Descargas:\n"
         for i, (destino, hora_descarga, ref) in enumerate(destinos):
             if destino.strip():
-                mensaje += f"  - Destino {i+1}: {destino} (Hora: {hora_descarga}, Ref. cliente: {ref})\n"
+                mensaje += f"  - Destino {i+1}: {destino} ({hora_descarga}, Ref. cliente: {ref})\n"
 
         if tipo_mercancia.strip():
             mensaje += f"\n📦 Tipo de mercancía: {tipo_mercancia.strip()}"

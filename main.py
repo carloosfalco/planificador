@@ -4,7 +4,7 @@ from rutas import planificador_rutas
 
 st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
 
-menu = st.sidebar.radio("📂 Selecciona una funcionalidad:", ["📍 Planificador de rutas", "🚚 Asignación de cargas"])
+menu = st.sidebar.radio("📂 Selecciona una funcionalidad:", ["🚚 Asignación de cargas","📍 Planificador de rutas"])
 
 if menu == "🚚 Asignación de cargas":
    mostrar_asignacion_cargas()

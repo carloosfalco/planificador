@@ -44,6 +44,7 @@ Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/
 
         st.markdown("### ✉️ Orden generada:")
         st.code(mensaje, language="markdown")
+        st.success("✅ Orden generada con éxito.")
    
 
 # Para incluir en tu main.py:

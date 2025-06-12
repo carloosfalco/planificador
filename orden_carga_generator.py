@@ -53,12 +53,5 @@ def generar_orden_carga():
         mensaje = mensaje.strip()
 
         st.markdown("### ✉️ Orden generada:")
-        st.text_area("Mensaje generado", mensaje, height=350, key="mensaje_generado")
+       st.code(mensaje, language="markdown")
 
-        # Botón de copiar usando native Streamlit clipboard feature (solo desde versión 1.25 en adelante)
-        st.download_button(
-            label="📋 Copiar / Descargar orden",
-            data=mensaje,
-            file_name=f"orden_carga_{fecha_carga.strftime('%d%m%Y')}.txt",
-            mime="text/plain"
-        )

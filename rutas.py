@@ -7,7 +7,7 @@ import folium
 from streamlit_folium import st_folium
 from PIL import Image
 
-def mostrar_planificador_rutas():
+def planificador_rutas():
     # Configuración
     api_key = "5b3ce3597851110001cf6248ec3aedee3fa14ae4b1fd1b2440f2e589"
     client = openrouteservice.Client(key=api_key)

@@ -7,8 +7,7 @@ def generar_orden_carga():
 
     with st.form("orden_form"):
         chofer = st.text_input("Nombre del chofer")
-        cliente = st.text_input("Cliente")
-
+        
         num_origenes = st.number_input("Número de ubicaciones de carga", min_value=1, max_value=5, value=1)
         origenes = [st.text_input(f"📍 Origen {i+1}") for i in range(num_origenes)]
 
@@ -27,7 +26,7 @@ def generar_orden_carga():
         mensaje = f"""
 Hola {chofer}, esta es la orden de carga para el día {fecha_carga.strftime('%d/%m/%Y')}:
 
-🚚 Cliente: {cliente}
+
 ⏱ Hora de carga: {hora_carga.strftime('%H:%M')}
 📥 Hora de descarga: {hora_descarga}
 

@@ -7,3 +7,4 @@ streamlit-folium
 openpyxl
 geopy
 pandas
+openai

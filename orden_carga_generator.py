@@ -41,7 +41,7 @@ def generar_instrucciones_ruta():
 
             st.markdown("### 📋 Mensaje final para WhatsApp:")
             st.code(instrucciones.strip(), language=None)
-            st.download_button("📥 Descargar como .txt", instrucciones.strip(), file_name="instrucciones_ruta.txt")
+           
 
         except Exception as e:
             st.error(f"❌ Error al procesar el archivo: {e}")

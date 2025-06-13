@@ -8,14 +8,11 @@ from streamlit_folium import st_folium
 from PIL import Image
 
 def planificador_rutas():
-    # Configuración
+    # Configuración de cliente
     api_key = "5b3ce3597851110001cf6248ec3aedee3fa14ae4b1fd1b2440f2e589"
     client = openrouteservice.Client(key=api_key)
 
-    # Configuración de la página
-    st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
-
-    # Estilo
+    # Estilo visual (puedes mantenerlo)
     st.markdown("""
         <style>
             body {
@@ -36,7 +33,7 @@ def planificador_rutas():
         </style>
     """, unsafe_allow_html=True)
 
-    # Logo y encabezado al estilo clásico
+    # Logo y encabezado
     logo = Image.open("logo-virosque2-01.png")
     st.image(logo, width=250)
     st.markdown("<h1 style='color:#8D1B2D;'>TMS</h1>", unsafe_allow_html=True)
@@ -51,10 +48,8 @@ def planificador_rutas():
     with col3:
         hora_salida_str = st.time_input("🕒 Hora de salida", value=datetime.strptime("08:00", "%H:%M")).strftime("%H:%M")
 
-    # Paradas
     stops = st.text_area("➕ Paradas intermedias (una por línea)", placeholder="Ej: Albacete, España\nCuenca, España")
 
-    # Botón
     if st.button("🔍 Calcular Ruta"):
         st.session_state.resultados = None
 
@@ -86,7 +81,6 @@ def planificador_rutas():
             st.error(f"❌ Error al calcular la ruta: {e}")
             return
 
-        # Resultados
         segmentos = ruta['features'][0]['properties']['segments']
         distancia_total = sum(seg["distance"] for seg in segmentos)
         duracion_total = sum(seg["duration"] for seg in segmentos)
@@ -108,7 +102,6 @@ def planificador_rutas():
         tiempo_conduccion_txt = horas_y_minutos(duracion_horas)
         tiempo_total_txt = horas_y_minutos(tiempo_total_h)
 
-        # Guardar resultados
         st.session_state.resultados = {
             "distancia_km": distancia_km,
             "tiempo_conduccion_txt": tiempo_conduccion_txt,
@@ -121,11 +114,9 @@ def planificador_rutas():
             "coord_destino": coord_destino
         }
 
-    # Mostrar si hay resultados guardados
     if "resultados" in st.session_state and st.session_state.resultados:
         r = st.session_state.resultados
 
-        # Métricas
         st.markdown("### 📊 Datos de la ruta")
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("🚣 Distancia", f"{r['distancia_km']:.2f} km")
@@ -138,7 +129,6 @@ def planificador_rutas():
         else:
             st.success("🟢 El viaje puede completarse en una sola jornada de trabajo.")
 
-        # Mapa
         linea_latlon = [[p[1], p[0]] for p in r['linea']]
         m = folium.Map(location=linea_latlon[0], zoom_start=6)
         folium.Marker(location=[r['coord_origen'][1], r['coord_origen'][0]], tooltip="📍 Origen").add_to(m)
@@ -165,3 +155,4 @@ def geocode(direccion, api_key):
         return coord, label
     else:
         return None, None
+

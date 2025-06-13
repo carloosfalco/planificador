@@ -1,6 +1,6 @@
 import streamlit as st
 from rutas import planificador_rutas
-from orden_carga:generator import generar_instrucciones_ruta
+from orden_carga_generator import generar_instrucciones_ruta
 
 # Configuración de la página
 st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")

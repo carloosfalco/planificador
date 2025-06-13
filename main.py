@@ -1,6 +1,6 @@
 import streamlit as st
 from rutas import planificador_rutas
-from orden_carga_generator import generar_orden_carga
+from generador_ruta import generar_instrucciones_ruta
 
 # Configuración de la página
 st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
@@ -9,11 +9,11 @@ st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
 st.sidebar.title("📋 Menú")
 seccion = st.sidebar.radio("Selecciona una sección:", [
     "Planificador de Rutas",
-    "Orden de Carga"
+    "Instrucciones de Ruta"
 ])
 
 # Mostrar la sección seleccionada
 if seccion == "Planificador de Rutas":
     planificador_rutas()
-elif seccion == "Orden de Carga":
-    generar_orden_carga()
+elif seccion == "Instrucciones de Ruta":
+    generar_instrucciones_ruta()

@@ -1,19 +1,20 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Instrucciones de Ruta", page_icon="🚛", layout="wide")
+def generar_instrucciones_ruta():
+    st.title("🚛 Instrucciones de Ruta para el Conductor")
 
-st.title("🚛 Instrucciones de Ruta para el Conductor")
+    uploaded_file = st.file_uploader("📁 Sube el archivo Excel exportado de Trans2000", type=["xlsx"])
 
-uploaded_file = st.file_uploader("📁 Sube el archivo Excel exportado de Trans2000", type=["xlsx"])
+    if uploaded_file:
+        try:
+            df = pd.read_excel(uploaded_file, sheet_name=0)
+            columnas = ['Fecha', 'Tipo', 'Nombre', 'Albarán', 'Domicilio', 'Población', 'Provincia', 'Palets']
 
-if uploaded_file:
-    try:
-        df = pd.read_excel(uploaded_file, sheet_name=0)
-        columnas = ['Fecha', 'Tipo', 'Nombre', 'Albarán', 'Domicilio', 'Población', 'Provincia', 'Palets']
-        if not all(col in df.columns for col in columnas):
-            st.error("❌ El archivo no contiene todas las columnas necesarias.")
-        else:
+            if not all(col in df.columns for col in columnas):
+                st.error("❌ El archivo no contiene todas las columnas necesarias.")
+                return
+
             df = df[columnas].sort_values(by=['Fecha', 'Tipo']).reset_index(drop=True)
 
             pedido = st.text_input("📝 Introduce el número de pedido:", placeholder="Ej: 4587")
@@ -42,9 +43,5 @@ if uploaded_file:
             st.code(instrucciones.strip(), language=None)
             st.download_button("📥 Descargar como .txt", instrucciones.strip(), file_name="instrucciones_ruta.txt")
 
-    except Exception as e:
-        st.error(f"❌ Error al procesar el archivo: {e}")
-
-
-    except Exception as e:
-        st.error(f"❌ Error al procesar el archivo: {e}")
+        except Exception as e:
+            st.error(f"❌ Error al procesar el archivo: {e}")

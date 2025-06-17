@@ -8,7 +8,7 @@ def main():
     st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
 
     st.sidebar.title("📂 Menú")
-    seleccion = st.sidebar.radio("Selecciona una opción", ["Planificador de rutas", "Orden de carga", "Calendario de eventos"])
+    seleccion = st.sidebar.radio("Selecciona una opción", ["Planificador de rutas", "Orden de carga", "Calendario de eventos", "Matrículas"])
 
     if seleccion == "Planificador de rutas":
         planificador_rutas()

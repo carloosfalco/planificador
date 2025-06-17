@@ -22,8 +22,14 @@ def matriculas():
     edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
 
     if st.button("💾 Guardar cambios"):
-        guardar_matriculas(edited_df)
-        st.success("Cambios guardados correctamente")
+        # Validar duplicados antes de guardar
+        if edited_df["chófer"].duplicated().any():
+            st.error("❌ No puede haber chóferes duplicados.")
+        elif edited_df[["tractora", "remolque"]].stack().duplicated().any():
+            st.error("❌ Hay matrículas de tractora o remolque duplicadas.")
+        else:
+            guardar_matriculas(edited_df)
+            st.success("Cambios guardados correctamente")
 
     st.divider()
 
@@ -35,7 +41,24 @@ def matriculas():
         crear = st.form_submit_button("Añadir")
 
         if crear:
-            if chofer and tractora and remolque:
+            errores = []
+            if not chofer or not tractora or not remolque:
+                errores.append("Debes completar todos los campos.")
+
+            # Validaciones
+            if chofer in df["chófer"].values:
+                errores.append("Ya existe un chófer con ese nombre.")
+
+            todas_matriculas = pd.concat([df["tractora"], df["remolque"]]).dropna().unique().tolist()
+            if tractora in todas_matriculas:
+                errores.append("La matrícula de la tractora ya está registrada.")
+            if remolque in todas_matriculas:
+                errores.append("La matrícula del remolque ya está registrada.")
+
+            if errores:
+                for err in errores:
+                    st.error(f"❌ {err}")
+            else:
                 nuevo = pd.DataFrame([{
                     "chófer": chofer,
                     "tractora": tractora,
@@ -43,7 +66,5 @@ def matriculas():
                 }])
                 df = pd.concat([df, nuevo], ignore_index=True)
                 guardar_matriculas(df)
-                st.success("Registro añadido")
+                st.success("Registro añadido correctamente.")
                 st.rerun()
-            else:
-                st.warning("Completa todos los campos")

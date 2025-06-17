@@ -1,22 +1,33 @@
 import streamlit as st
 from streamlit_calendar import calendar
-from datetime import datetime, timedelta
+from datetime import datetime, date, time
 import uuid
 
 def calendario_eventos():
     st.title("🗓️ Calendario interactivo Virosque")
 
-    # Inicializar eventos
+    # Inicialización segura
     if "eventos" not in st.session_state:
         st.session_state.eventos = []
 
-    # Mostrar calendario visual
-    st.subheader("📆 Vista calendario")
+    # Preparar eventos para el calendario
+    eventos_formateados = []
+    for evento in st.session_state.eventos:
+        if isinstance(evento["fecha"], date):
+            fecha_datetime = datetime.combine(evento["fecha"], time(0, 0))
+        else:
+            fecha_datetime = evento["fecha"]
+        eventos_formateados.append({
+            "id": evento["id"],
+            "title": f'{evento["asunto"]} - {evento["ubicacion"]}',
+            "start": fecha_datetime.isoformat(),
+            "allDay": True
+        })
 
     calendar_options = {
         "initialView": "dayGridMonth",
-        "editable": True,
-        "selectable": True,
+        "editable": False,
+        "selectable": False,
         "headerToolbar": {
             "left": "prev,next today",
             "center": "title",
@@ -24,47 +35,44 @@ def calendario_eventos():
         }
     }
 
-    eventos_calendario = [
-        {
-            "id": e["id"],
-            "title": f'{e["asunto"]} - {e["ubicacion"]}',
-            "start": e["fecha"].strftime("%Y-%m-%dT%H:%M:%S"),  # formato correcto
-            "allDay": True
-        }
-        for e in st.session_state.eventos
-    ]
-
-    calendar(events=eventos_calendario, options=calendar_options, key="calendario")
+    # Mostrar calendario visual
+    st.subheader("📆 Vista calendario")
+    calendar(events=eventos_formateados, options=calendar_options)
 
     st.divider()
-    st.subheader("➕ Crear nuevo evento")
 
-    with st.form("form_manual"):
+    # Formulario para añadir eventos
+    st.subheader("➕ Crear nuevo evento")
+    with st.form("form_evento"):
         asunto = st.text_input("Asunto")
         ubicacion = st.text_input("Ubicación")
-        fecha = st.date_input("Fecha", datetime.today())
-        guardar = st.form_submit_button("Crear evento")
+        fecha = st.date_input("Fecha", value=date.today())
+        enviar = st.form_submit_button("Crear evento")
 
-        if guardar:
+        if enviar:
             if asunto and ubicacion:
                 nuevo_evento = {
                     "id": str(uuid.uuid4()),
                     "asunto": asunto,
                     "ubicacion": ubicacion,
-                    "fecha": datetime.combine(fecha, datetime.min.time()),  # fecha completa
+                    "fecha": fecha,
                 }
                 st.session_state.eventos.append(nuevo_evento)
-                st.success("✅ Evento añadido correctamente. Recargando...")
-                st.experimental_rerun()
+                st.success("✅ Evento añadido correctamente.")
+                st.rerun()
             else:
-                st.warning("❗ Rellena todos los campos.")
+                st.warning("Por favor, completa todos los campos.")
 
-    st.subheader("📋 Lista de eventos")
-    for i, e in enumerate(st.session_state.eventos):
-        col1, col2 = st.columns([0.85, 0.15])
-        with col1:
-            st.markdown(f"📌 **{e['asunto']}** — {e['ubicacion']} — {e['fecha'].strftime('%Y-%m-%d')}")
-        with col2:
-            if st.button("❌", key=f"del_{i}"):
-                st.session_state.eventos.pop(i)
-                st.experimental_rerun()
+    # Mostrar lista de eventos
+    st.subheader("📋 Eventos creados")
+    if not st.session_state.eventos:
+        st.info("No hay eventos todavía.")
+    else:
+        for i, e in enumerate(st.session_state.eventos):
+            col1, col2 = st.columns([0.85, 0.15])
+            with col1:
+                st.markdown(f"📌 **{e['asunto']}** — {e['ubicacion']} — {e['fecha']}")
+            with col2:
+                if st.button("❌", key=f"del_{i}"):
+                    st.session_state.eventos.pop(i)
+                    st.rerun()

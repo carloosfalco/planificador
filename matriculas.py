@@ -41,9 +41,9 @@ def matriculas():
 
     st.subheader("➕ Añadir nuevo registro")
     with st.form("form_nuevo"):
-        chofer = st.text_input("Nombre del chófer (opcional si es tractora/remolque libre)").strip()
-        tractora = st.text_input("Matrícula tractora (opcional)").strip()
-        remolque = st.text_input("Matrícula remolque (opcional)").strip()
+        chofer = st.text_input("Nombre del chófer").strip()
+        tractora = st.text_input("Matrícula tractora").strip()
+        remolque = st.text_input("Matrícula remolque").strip()
         crear = st.form_submit_button("Añadir")
 
         errores = []

@@ -63,7 +63,7 @@ def calendario_eventos():
     for e in eventos_filtrados:
         eventos_cal.append({
             "id": e["id"],
-            "title": f"{e['asunto']} ({e['Chófer']})",
+            "title": f"{e['asunto']} ({e['Chófer']}{e['tractora']})",
             "start": pd.to_datetime(e["fecha"]).strftime("%Y-%m-%dT%H:%M:%S"),
             "allDay": True
         })

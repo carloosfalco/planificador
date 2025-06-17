@@ -61,10 +61,12 @@ def calendario_eventos():
     st.subheader("📆 Vista calendario")
     eventos_cal = []
     for e in eventos_filtrados:
+        chofer = e.get("Chófer", "")
+        tractora = e.get("Tractora", "")
         eventos_cal.append({
-            "id": e["id"],
-            "title": f"{e['asunto']} ({e['Chófer']}{e['tractora']})",
-            "start": pd.to_datetime(e["fecha"]).strftime("%Y-%m-%dT%H:%M:%S"),
+            "id": e.get("id", ""),
+            "title": f"{e.get('asunto', '')} ({chofer} {tractora})",
+            "start": pd.to_datetime(e.get("fecha", date.today())).strftime("%Y-%m-%dT%H:%M:%S"),
             "allDay": True
         })
 

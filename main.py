@@ -1,6 +1,6 @@
 import streamlit as st
 from rutas import planificador_rutas
-from orden_carga import orden_carga
+from orden_carga_generator import generar_instrucciones_ruta
 from calendario import calendario_eventos
 from matriculas import matriculas
 
@@ -18,7 +18,7 @@ def main():
     if seleccion == "Planificador de rutas":
         planificador_rutas()
     elif seleccion == "Orden de carga":
-        orden_carga()
+        generar_instrucciones_ruta()
     elif seleccion == "Calendario de eventos":
         calendario_eventos()
     elif seleccion == "Matrículas":

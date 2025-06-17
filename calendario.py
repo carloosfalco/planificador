@@ -34,14 +34,16 @@ def calendario_eventos():
         st.session_state.filtro_chofers = []
     if "filtro_matriculas" not in st.session_state:
         st.session_state.filtro_matriculas = []
+    if "tipo_evento" not in st.session_state:
+        st.session_state.tipo_evento = "Chofer"
+    if "asociado_seleccionado" not in st.session_state:
+        st.session_state.asociado_seleccionado = ""
 
     matriculas_df = cargar_matriculas()
 
-    # Obtener listas
     todos_chofers = sorted(matriculas_df["chófer"].dropna().unique().tolist())
     todas_matriculas = sorted(set(matriculas_df["tractora"].dropna().tolist() + matriculas_df["remolque"].dropna().tolist()))
 
-    # Filtros múltiples
     st.subheader("🔎 Filtros")
     st.session_state.filtro_chofers = st.multiselect("Filtrar por chófer(es)", todos_chofers, default=st.session_state.filtro_chofers)
     st.session_state.filtro_matriculas = st.multiselect("Filtrar por matrícula(s)", todas_matriculas, default=st.session_state.filtro_matriculas)
@@ -53,7 +55,6 @@ def calendario_eventos():
         if coincide_chofer and coincide_matricula:
             eventos_filtrados.append(e)
 
-    # Mostrar calendario
     st.subheader("📆 Vista calendario")
     eventos_cal = []
     for e in eventos_filtrados:
@@ -74,12 +75,9 @@ def calendario_eventos():
             "right": "dayGridMonth,timeGridWeek,timeGridDay"
         }
     }
-
     calendar(events=eventos_cal, options=calendar_options)
-
     st.divider()
 
-    # Crear o editar evento
     if st.session_state.editando_evento is None:
         st.subheader("➕ Crear nuevo evento")
         modo = "crear"
@@ -95,23 +93,22 @@ def calendario_eventos():
             st.rerun()
 
     with st.form("form_evento"):
-        tipo = st.selectbox("Tipo de evento", ["Chofer", "Mantenimiento"], index=0 if evento["tipo"] == "Chofer" else 1)
+        st.session_state.tipo_evento = st.selectbox("Tipo de evento", ["Chofer", "Mantenimiento"], index=0 if evento["tipo"] == "Chofer" else 1)
 
-        if tipo == "Chofer":
+        if st.session_state.tipo_evento == "Chofer":
             choferes = sorted(matriculas_df["chófer"].dropna().unique())
-            asociado = st.selectbox("Nombre del chófer", choferes, index=choferes.index(evento["asociado"]) if evento["asociado"] in choferes else 0)
-            fila = matriculas_df[matriculas_df["chófer"] == asociado]
+            st.session_state.asociado_seleccionado = st.selectbox("Nombre del chófer", choferes)
+            fila = matriculas_df[matriculas_df["chófer"] == st.session_state.asociado_seleccionado]
             if not fila.empty:
                 fila = fila.iloc[0]
                 tractora = fila["tractora"]
                 remolque = fila["remolque"]
                 st.markdown(f"**Tractora:** {tractora} &nbsp;&nbsp;&nbsp; **Remolque:** {remolque}")
-            else:
-                tractora = remolque = ""
+                chofer = st.session_state.asociado_seleccionado
         else:
             matriculas = sorted(set(matriculas_df["tractora"].dropna().tolist() + matriculas_df["remolque"].dropna().tolist()))
-            asociado = st.selectbox("Matrícula tractora o remolque", matriculas, index=matriculas.index(evento["asociado"]) if evento["asociado"] in matriculas else 0)
-            fila = matriculas_df[(matriculas_df["tractora"] == asociado) | (matriculas_df["remolque"] == asociado)]
+            st.session_state.asociado_seleccionado = st.selectbox("Matrícula tractora o remolque", matriculas)
+            fila = matriculas_df[(matriculas_df["tractora"] == st.session_state.asociado_seleccionado) | (matriculas_df["remolque"] == st.session_state.asociado_seleccionado)]
             if not fila.empty:
                 fila = fila.iloc[0]
                 tractora = fila["tractora"]
@@ -119,41 +116,45 @@ def calendario_eventos():
                 chofer = fila["chófer"]
                 st.markdown(f"**Chófer:** {chofer} &nbsp;&nbsp;&nbsp; **Tractora:** {tractora} &nbsp;&nbsp;&nbsp; **Remolque:** {remolque}")
             else:
-                tractora = remolque = chofer = ""
+                chofer = ""
+                tractora = remolque = ""
 
         asunto = st.text_input("Asunto", value=evento.get("asunto", ""))
         ubicacion = st.text_input("Ubicación", value=evento.get("ubicacion", ""))
         fecha = st.date_input("Fecha", value=evento.get("fecha", date.today()))
 
         col1, col2 = st.columns(2)
-        guardar = col1.form_submit_button("💾 Guardar")
+        guardar = col1.form_submit_button("📅 Guardar")
         cancelar = col2.form_submit_button("Cancelar")
 
         if guardar:
-            nuevo = {
-                "id": evento.get("id", str(uuid.uuid4())),
-                "tipo": tipo,
-                "asociado": asociado,
-                "asunto": asunto,
-                "ubicacion": ubicacion,
-                "fecha": fecha.isoformat(),
-                "chofer": asociado if tipo == "Chofer" else chofer,
-                "tractora": tractora,
-                "remolque": remolque
-            }
-
-            if modo == "crear":
-                st.session_state.eventos.append(nuevo)
+            if not asunto or not ubicacion or not st.session_state.asociado_seleccionado:
+                st.warning("Completa todos los campos obligatorios.")
             else:
-                for i, e in enumerate(st.session_state.eventos):
-                    if e["id"] == nuevo["id"]:
-                        st.session_state.eventos[i] = nuevo
-                        break
-                st.session_state.editando_evento = None
+                nuevo = {
+                    "id": evento.get("id", str(uuid.uuid4())),
+                    "tipo": st.session_state.tipo_evento,
+                    "asociado": st.session_state.asociado_seleccionado,
+                    "asunto": asunto,
+                    "ubicacion": ubicacion,
+                    "fecha": fecha.isoformat(),
+                    "chofer": chofer,
+                    "tractora": tractora,
+                    "remolque": remolque
+                }
+                if modo == "crear":
+                    st.session_state.eventos.append(nuevo)
+                else:
+                    for i, e in enumerate(st.session_state.eventos):
+                        if e["id"] == nuevo["id"]:
+                            st.session_state.eventos[i] = nuevo
+                            break
+                    st.session_state.editando_evento = None
 
-            guardar_eventos(st.session_state.eventos)
-            st.success("✅ Evento guardado correctamente")
-            st.rerun()
+                guardar_eventos(st.session_state.eventos)
+                st.success("✅ Evento guardado correctamente")
+                st.rerun()
+
         elif cancelar:
             st.session_state.editando_evento = None
             st.rerun()

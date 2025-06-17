@@ -2,6 +2,7 @@ import streamlit as st
 from rutas import planificador_rutas
 from orden_carga_generator import generar_instrucciones_ruta  # ✅ nombre correcto del archivo
 from calendario import calendario_eventos  # ✅ nuevo módulo del calendario
+from matriculas import matriculas
 
 def main():
     st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
@@ -15,6 +16,8 @@ def main():
         generar_instrucciones_ruta()
     elif seleccion == "Calendario de eventos":
         calendario_eventos()
+    elif seleccion == "Matrículas":
+    matriculas()
 
 if __name__ == "__main__":
     main()

@@ -26,8 +26,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-import os
 
-if os.path.exists("eventos.csv"):
-    os.remove("eventos.csv")
-    print("Archivo eventos.csv eliminado")
+

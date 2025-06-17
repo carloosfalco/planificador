@@ -22,47 +22,60 @@ def matriculas():
     edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
 
     if st.button("💾 Guardar cambios"):
-        # Validar duplicados antes de guardar
-        if edited_df["chófer"].duplicated().any():
+        choferes_duplicados = edited_df["chófer"].dropna().duplicated().any()
+        matriculas_total = pd.concat([
+            edited_df["tractora"].dropna(),
+            edited_df["remolque"].dropna()
+        ])
+        matriculas_duplicadas = matriculas_total.duplicated().any()
+
+        if choferes_duplicados:
             st.error("❌ No puede haber chóferes duplicados.")
-        elif edited_df[["tractora", "remolque"]].stack().duplicated().any():
-            st.error("❌ Hay matrículas de tractora o remolque duplicadas.")
+        elif matriculas_duplicadas:
+            st.error("❌ No puede haber matrículas de tractora o remolque duplicadas.")
         else:
             guardar_matriculas(edited_df)
-            st.success("Cambios guardados correctamente")
+            st.success("Cambios guardados correctamente.")
 
     st.divider()
 
     st.subheader("➕ Añadir nuevo registro")
     with st.form("form_nuevo"):
-        chofer = st.text_input("Nombre del chófer")
-        tractora = st.text_input("Matrícula tractora")
-        remolque = st.text_input("Matrícula remolque")
+        chofer = st.text_input("Nombre del chófer (opcional si es tractora/remolque libre)").strip()
+        tractora = st.text_input("Matrícula tractora (opcional)").strip()
+        remolque = st.text_input("Matrícula remolque (opcional)").strip()
         crear = st.form_submit_button("Añadir")
 
-        if crear:
-            errores = []
-            if not chofer or not tractora or not remolque:
-                errores.append("Debes completar todos los campos.")
+        errores = []
 
-            # Validaciones
-            if chofer in df["chófer"].values:
+        if crear:
+            # Validar chofer duplicado si está definido
+            if chofer and chofer in df["chófer"].dropna().values:
                 errores.append("Ya existe un chófer con ese nombre.")
 
-            todas_matriculas = pd.concat([df["tractora"], df["remolque"]]).dropna().unique().tolist()
-            if tractora in todas_matriculas:
+            # Validar duplicados de matrículas
+            todas_matriculas = pd.concat([
+                df["tractora"].dropna(),
+                df["remolque"].dropna()
+            ]).unique().tolist()
+
+            if tractora and tractora in todas_matriculas:
                 errores.append("La matrícula de la tractora ya está registrada.")
-            if remolque in todas_matriculas:
+            if remolque and remolque in todas_matriculas:
                 errores.append("La matrícula del remolque ya está registrada.")
+
+            # Al menos uno de los tres campos debe tener valor
+            if not chofer and not tractora and not remolque:
+                errores.append("Debes rellenar al menos un campo.")
 
             if errores:
                 for err in errores:
                     st.error(f"❌ {err}")
             else:
                 nuevo = pd.DataFrame([{
-                    "chófer": chofer,
-                    "tractora": tractora,
-                    "remolque": remolque
+                    "chófer": chofer if chofer else None,
+                    "tractora": tractora if tractora else None,
+                    "remolque": remolque if remolque else None
                 }])
                 df = pd.concat([df, nuevo], ignore_index=True)
                 guardar_matriculas(df)

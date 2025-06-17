@@ -17,8 +17,12 @@ def cargar_eventos():
     return []
 
 def guardar_eventos(eventos):
-    df = pd.DataFrame(eventos)
-    df = df[COLUMNAS_EVENTOS]  # asegurar columnas correctas
+    # Asegurar que cada evento tiene todas las columnas necesarias
+    eventos_limpios = []
+    for e in eventos:
+        evento = {col: e.get(col, "") for col in COLUMNAS_EVENTOS}
+        eventos_limpios.append(evento)
+    df = pd.DataFrame(eventos_limpios)
     df.to_csv(CSV_EVENTOS, index=False)
 
 def cargar_matriculas():

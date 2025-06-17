@@ -134,7 +134,7 @@ def planificador_rutas():
         folium.Marker(location=[r['coord_origen'][1], r['coord_origen'][0]], tooltip="📍 Origen").add_to(m)
         for idx, parada in enumerate(r['stops_list']):
             folium.Marker(location=[parada[1], parada[0]], tooltip=f"Parada {idx + 1}").add_to(m)
-        folium.Marker(location=[r['coord_destino'][1], r['coord_destino'][0]], tooltip="🏑 Destino").add_to(m)
+        folium.Marker(location=[r['coord_destino'][1], r['coord_destino'][0]], tooltip="Destino").add_to(m)
         folium.PolyLine(linea_latlon, color="blue", weight=5).add_to(m)
         st.markdown("### 🗘️ Ruta estimada en mapa:")
         st_folium(m, width=1200, height=500)

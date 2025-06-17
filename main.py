@@ -1,19 +1,19 @@
 import streamlit as st
 from rutas import planificador_rutas
-from orden import orden_carga
-from calendario import calendario_eventos  # 👈 nuevo módulo importado
+from orden_carga_generator import generar_instrucciones_ruta  # ✅ nombre correcto del archivo
+from calendario import calendario_eventos  # ✅ nuevo módulo del calendario
 
 def main():
     st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
 
     st.sidebar.title("📂 Menú")
-    seleccion = st.sidebar.radio("Selecciona una opción", ["Planificador de rutas", "Orden de carga", "Calendario de eventos"])  # 👈 añadida opción
+    seleccion = st.sidebar.radio("Selecciona una opción", ["Planificador de rutas", "Orden de carga", "Calendario de eventos"])
 
     if seleccion == "Planificador de rutas":
         planificador_rutas()
     elif seleccion == "Orden de carga":
-        orden_carga()
-    elif seleccion == "Calendario de eventos":  # 👈 nuevo bloque
+        generar_instrucciones_ruta()
+    elif seleccion == "Calendario de eventos":
         calendario_eventos()
 
 if __name__ == "__main__":

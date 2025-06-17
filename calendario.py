@@ -5,7 +5,7 @@ import uuid
 import pandas as pd
 import os
 
-CSV_EVENTOS = "eventos.csv"
+CSV_EVENTOS = "eventos2.csv"
 CSV_MATRICULAS = "matriculas.csv"
 
 COLUMNAS_EVENTOS = ["id", "Tipo", "Chófer", "Tractora", "Remolque", "asunto", "ubicacion", "fecha"]

@@ -85,8 +85,9 @@ def calendario_eventos():
 
     with st.form("form_evento"):
         tipo = st.selectbox("Tipo de evento", ["Chofer", "Mantenimiento"])
+        asociado = ""
 
-                if tipo == "Chofer":
+        if tipo == "Chofer":
             choferes = sorted(matriculas_df["chófer"].dropna().unique())
             if choferes:
                 chofer = st.selectbox("Nombre del chófer", choferes)
@@ -97,33 +98,31 @@ def calendario_eventos():
                     remolque = fila["remolque"]
                     st.markdown(f"**Tractora:** {tractora} &nbsp;&nbsp;&nbsp; **Remolque:** {remolque}")
                 else:
-                    st.warning("Chófer no encontrado en la tabla.")
+                    st.warning("❗ Chófer no encontrado en la tabla.")
                 asociado = chofer
             else:
-                st.warning("No hay chóferes registrados.")
-                asociado = ""
-
-
-        else:  # Mantenimiento
+                st.warning("❗ No hay chóferes registrados.")
+        else:
             todas_matriculas = pd.concat([
                 matriculas_df["tractora"].dropna(),
                 matriculas_df["remolque"].dropna()
             ]).unique()
-            matricula = st.selectbox("Matrícula (tractora o remolque)", sorted(todas_matriculas))
-
-            # Buscar información complementaria
-            fila = matriculas_df[
-                (matriculas_df["tractora"] == matricula) | (matriculas_df["remolque"] == matricula)
-            ]
-            if not fila.empty:
-                fila = fila.iloc[0]
-                chofer = fila["chófer"]
-                tractora = fila["tractora"]
-                remolque = fila["remolque"]
-                st.markdown(f"**Chófer:** {chofer} &nbsp;&nbsp;&nbsp; **Tractora:** {tractora} &nbsp;&nbsp;&nbsp; **Remolque:** {remolque}")
+            if len(todas_matriculas) > 0:
+                matricula = st.selectbox("Matrícula (tractora o remolque)", sorted(todas_matriculas))
+                fila = matriculas_df[
+                    (matriculas_df["tractora"] == matricula) | (matriculas_df["remolque"] == matricula)
+                ]
+                if not fila.empty:
+                    fila = fila.iloc[0]
+                    chofer = fila["chófer"]
+                    tractora = fila["tractora"]
+                    remolque = fila["remolque"]
+                    st.markdown(f"**Chófer:** {chofer} &nbsp;&nbsp;&nbsp; **Tractora:** {tractora} &nbsp;&nbsp;&nbsp; **Remolque:** {remolque}")
+                else:
+                    st.warning("❗ Matrícula no está asignada a ningún chófer.")
+                asociado = matricula
             else:
-                chofer = "No asignado"
-            asociado = matricula
+                st.warning("❗ No hay matrículas registradas.")
 
         asunto = st.text_input("Asunto")
         ubicacion = st.text_input("Ubicación")
@@ -142,7 +141,7 @@ def calendario_eventos():
                 }
                 st.session_state.eventos.append(nuevo_evento)
                 guardar_eventos(st.session_state.eventos)
-                st.success("✅ Evento creado")
+                st.success("✅ Evento creado correctamente")
                 st.rerun()
             else:
                 st.warning("Completa todos los campos obligatorios.")
@@ -161,4 +160,3 @@ def calendario_eventos():
                     st.session_state.eventos = [ev for ev in st.session_state.eventos if ev["id"] != e["id"]]
                     guardar_eventos(st.session_state.eventos)
                     st.rerun()
-

@@ -22,7 +22,7 @@ def main():
     elif seleccion == "Calendario de eventos":
         calendario_eventos()
     elif seleccion == "Matrículas":
-        matriculas()
+        matriculas()  # 👈 esta línea debe ir indentada exactamente como aquí
 
 if __name__ == "__main__":
     main()

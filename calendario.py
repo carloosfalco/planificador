@@ -2,28 +2,42 @@ import streamlit as st
 from streamlit_calendar import calendar
 from datetime import datetime, date, time
 import uuid
+import pandas as pd
+import os
+
+CSV_FILE = "eventos.csv"
+
+# Función para cargar eventos desde CSV
+def cargar_eventos():
+    if os.path.exists(CSV_FILE):
+        df = pd.read_csv(CSV_FILE)
+        return df.to_dict(orient="records")
+    return []
+
+# Función para guardar eventos en CSV
+def guardar_eventos(eventos):
+    df = pd.DataFrame(eventos)
+    df.to_csv(CSV_FILE, index=False)
 
 def calendario_eventos():
     st.title("🗓️ Calendario interactivo Virosque")
 
-    # Inicialización segura
+    # Inicializar eventos con persistencia
     if "eventos" not in st.session_state:
-        st.session_state.eventos = []
+        st.session_state.eventos = cargar_eventos()
 
-    # Preparar eventos para el calendario
+    # Convertir fechas a datetime
     eventos_formateados = []
-    for evento in st.session_state.eventos:
-        if isinstance(evento["fecha"], date):
-            fecha_datetime = datetime.combine(evento["fecha"], time(0, 0))
-        else:
-            fecha_datetime = evento["fecha"]
+    for e in st.session_state.eventos:
+        fecha_obj = pd.to_datetime(e["fecha"])
         eventos_formateados.append({
-            "id": evento["id"],
-            "title": f'{evento["asunto"]} - {evento["ubicacion"]}',
-            "start": fecha_datetime.isoformat(),
+            "id": e["id"],
+            "title": f'{e["asunto"]} - {e["ubicacion"]}',
+            "start": fecha_obj.strftime("%Y-%m-%dT%H:%M:%S"),
             "allDay": True
         })
 
+    # Mostrar calendario
     calendar_options = {
         "initialView": "dayGridMonth",
         "editable": False,
@@ -35,13 +49,10 @@ def calendario_eventos():
         }
     }
 
-    # Mostrar calendario visual
     st.subheader("📆 Vista calendario")
     calendar(events=eventos_formateados, options=calendar_options)
 
     st.divider()
-
-    # Formulario para añadir eventos
     st.subheader("➕ Crear nuevo evento")
     with st.form("form_evento"):
         asunto = st.text_input("Asunto")
@@ -55,15 +66,15 @@ def calendario_eventos():
                     "id": str(uuid.uuid4()),
                     "asunto": asunto,
                     "ubicacion": ubicacion,
-                    "fecha": fecha,
+                    "fecha": fecha.isoformat(),
                 }
                 st.session_state.eventos.append(nuevo_evento)
-                st.success("✅ Evento añadido correctamente.")
+                guardar_eventos(st.session_state.eventos)
+                st.success("✅ Evento guardado correctamente.")
                 st.rerun()
             else:
-                st.warning("Por favor, completa todos los campos.")
+                st.warning("Completa todos los campos.")
 
-    # Mostrar lista de eventos
     st.subheader("📋 Eventos creados")
     if not st.session_state.eventos:
         st.info("No hay eventos todavía.")
@@ -75,4 +86,6 @@ def calendario_eventos():
             with col2:
                 if st.button("❌", key=f"del_{i}"):
                     st.session_state.eventos.pop(i)
+                    guardar_eventos(st.session_state.eventos)
                     st.rerun()
+

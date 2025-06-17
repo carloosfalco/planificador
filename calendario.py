@@ -86,14 +86,23 @@ def calendario_eventos():
     with st.form("form_evento"):
         tipo = st.selectbox("Tipo de evento", ["Chofer", "Mantenimiento"])
 
-        if tipo == "Chofer":
+                if tipo == "Chofer":
             choferes = sorted(matriculas_df["chófer"].dropna().unique())
-            chofer = st.selectbox("Nombre del chófer", choferes)
-            fila = matriculas_df[matriculas_df["chófer"] == chofer].iloc[0]
-            tractora = fila["tractora"]
-            remolque = fila["remolque"]
-            st.markdown(f"**Tractora:** {tractora} &nbsp;&nbsp;&nbsp; **Remolque:** {remolque}")
-            asociado = chofer
+            if choferes:
+                chofer = st.selectbox("Nombre del chófer", choferes)
+                fila = matriculas_df[matriculas_df["chófer"] == chofer]
+                if not fila.empty:
+                    fila = fila.iloc[0]
+                    tractora = fila["tractora"]
+                    remolque = fila["remolque"]
+                    st.markdown(f"**Tractora:** {tractora} &nbsp;&nbsp;&nbsp; **Remolque:** {remolque}")
+                else:
+                    st.warning("Chófer no encontrado en la tabla.")
+                asociado = chofer
+            else:
+                st.warning("No hay chóferes registrados.")
+                asociado = ""
+
 
         else:  # Mantenimiento
             todas_matriculas = pd.concat([

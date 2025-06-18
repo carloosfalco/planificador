@@ -10,7 +10,15 @@ CSV_MOVIMIENTOS = "movimientos.csv"
 
 def cargar_matriculas():
     if os.path.exists(CSV_FILE):
-        return pd.read_csv(CSV_FILE)
+        try:
+            df = pd.read_csv(CSV_FILE)
+            if "chófer" not in df.columns:
+                st.warning("El archivo de matrículas no contiene la columna 'chófer'. Se usará estructura vacía.")
+                return pd.DataFrame(columns=["chófer", "tractora", "remolque"])
+            return df
+        except Exception as e:
+            st.error(f"Error al leer el archivo: {e}")
+            return pd.DataFrame(columns=["chófer", "tractora", "remolque"])
     else:
         return pd.DataFrame(columns=["chófer", "tractora", "remolque"])
 
@@ -108,7 +116,12 @@ def matriculas():
     st.subheader("📝 Registrar movimiento de matrículas")
     with st.form("form_movimiento"):
         fecha_mov = st.date_input("📅 Fecha", value=date.today())
-        chofer_mov = st.selectbox("👤 Chófer", options=[""] + df["chófer"].dropna().unique().tolist())
+        if "chófer" in df.columns:
+            choferes_disponibles = [""] + df["chófer"].dropna().unique().tolist()
+        else:
+            choferes_disponibles = [""]
+
+        chofer_mov = st.selectbox("👤 Chófer", options=choferes_disponibles)
         deja = st.text_input("🚛 Tractora/Remolque que deja")
         coge = st.text_input("🚚 Tractora/Remolque que coge")
         registrar = st.form_submit_button("Registrar movimiento")

@@ -14,6 +14,17 @@ def cargar_matriculas():
     if os.path.exists(CSV_FILE):
         try:
             df = pd.read_csv(CSV_FILE)
+            columnas = [unidecode.unidecode(col).strip().lower() for col in df.columns]
+            mapping = {}
+            for col in df.columns:
+                normalized = unidecode.unidecode(col).strip().lower()
+                if normalized == "chofer":
+                    mapping[col] = "chófer"
+                elif normalized == "tractora":
+                    mapping[col] = "tractora"
+                elif normalized == "remolque":
+                    mapping[col] = "remolque"
+            df.rename(columns=mapping, inplace=True)
             if "chófer" not in df.columns:
                 st.warning("El archivo de matrículas no contiene la columna 'chófer'. Se usará estructura vacía.")
                 return pd.DataFrame(columns=["chófer", "tractora", "remolque"])
@@ -55,7 +66,15 @@ def matriculas():
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
         df.columns = [unidecode.unidecode(col).strip().lower() for col in df.columns]
-        df.rename(columns={"chofer": "chófer"}, inplace=True)
+        mapping = {}
+        for col in df.columns:
+            if "chofer" in col:
+                mapping[col] = "chófer"
+            elif "tractora" in col:
+                mapping[col] = "tractora"
+            elif "remolque" in col:
+                mapping[col] = "remolque"
+        df.rename(columns=mapping, inplace=True)
 
         if "chófer" not in df.columns:
             st.warning(f"El archivo subido tiene estas columnas: {df.columns.tolist()}")
@@ -65,16 +84,16 @@ def matriculas():
             df["chófer"] = df["chófer"].astype(str).str.strip().str.title()
             if "tractora" in df.columns:
                 df["tractora"] = df["tractora"].astype(str).str.strip().str.upper()
-                invalid_tractora = df[~df["tractora"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+                invalid_tractora = df[~df["tractora"].apply(lambda x: bool(re.match(r"^\\d{4}[A-Z]{3}$", x)) or x == '')]
                 if not invalid_tractora.empty:
                     st.warning(f"Estas tractoras tienen un formato inválido y serán descartadas: {invalid_tractora['tractora'].tolist()}")
-                df = df[df["tractora"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+                df = df[df["tractora"].apply(lambda x: bool(re.match(r"^\\d{4}[A-Z]{3}$", x)) or x == '')]
             if "remolque" in df.columns:
                 df["remolque"] = df["remolque"].astype(str).str.strip().str.upper()
-                invalid_remolque = df[~df["remolque"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+                invalid_remolque = df[~df["remolque"].apply(lambda x: bool(re.match(r"^\\d{4}[A-Z]{3}$", x)) or x == '')]
                 if not invalid_remolque.empty:
                     st.warning(f"Estos remolques tienen un formato inválido y serán descartados: {invalid_remolque['remolque'].tolist()}")
-                df = df[df["remolque"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+                df = df[df["remolque"].apply(lambda x: bool(re.match(r"^\\d{4}[A-Z]{3}$", x)) or x == '')]
 
         guardar_matriculas(df)
         st.success("Archivo cargado correctamente y datos guardados en CSV permanente.")

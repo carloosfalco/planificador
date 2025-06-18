@@ -2,7 +2,15 @@ import streamlit as st
 from rutas import planificador_rutas
 from orden_carga_generator import generar_instrucciones_ruta
 from calendario import calendario_eventos
-from matriculas import matriculas
+
+# Evitamos el error si unidecode no está disponible
+def safe_import_matriculas():
+    try:
+        from matriculas import matriculas
+        return matriculas
+    except ModuleNotFoundError as e:
+        st.error("❌ Módulo 'unidecode' no encontrado. Por favor instálalo con: pip install unidecode")
+        return lambda: None
 
 def main():
     st.set_page_config(page_title="Virosque TMS", page_icon="🚛", layout="wide")
@@ -22,9 +30,8 @@ def main():
     elif seleccion == "Calendario de eventos":
         calendario_eventos()
     elif seleccion == "Matrículas":
-        matriculas()  # 👈 esta línea debe ir indentada exactamente como aquí
+        matriculas_fn = safe_import_matriculas()
+        matriculas_fn()
 
 if __name__ == "__main__":
     main()
-
-

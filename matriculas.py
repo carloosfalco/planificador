@@ -52,10 +52,34 @@ def matriculas():
     uploaded_file = st.file_uploader("📤 Subir archivo Excel de matrículas", type=["xlsx"])
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
+        if "chófer" not in df.columns:
+            st.warning("El archivo subido no tiene la columna 'chófer'. Se ignorará.")
+            df = pd.DataFrame(columns=["chófer", "tractora", "remolque"])
         guardar_matriculas(df)
         st.success("Archivo cargado correctamente y datos guardados en CSV permanente.")
     else:
         df = cargar_matriculas()
+
+    st.subheader("📋 Tabla de chóferes y vehículos")
+    edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
+
+    if st.button("💾 Guardar cambios"):
+        choferes_duplicados = edited_df["chófer"].dropna().duplicated().any()
+        matriculas_total = pd.concat([
+            edited_df["tractora"].dropna(),
+            edited_df["remolque"].dropna()
+        ])
+        matriculas_duplicadas = matriculas_total.duplicated().any()
+
+        if choferes_duplicados:
+            st.error("❌ No puede haber chóferes duplicados.")
+        elif matriculas_duplicadas:
+            st.error("❌ No puede haber matrículas de tractora o remolque duplicadas.")
+        else:
+            guardar_matriculas(edited_df)
+            st.success("Cambios guardados correctamente.")
+
+    st.divider()
 
     st.subheader("📝 Registrar movimiento de matrículas")
     with st.form("form_movimiento"):
@@ -78,27 +102,6 @@ def matriculas():
             st.markdown(f"- Chófer: {chofer_mov}")
             st.markdown(f"- Deja: {deja}")
             st.markdown(f"- Coge: {coge}")
-
-    st.divider()
-
-    st.subheader("📋 Tabla de chóferes y vehículos")
-    edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
-
-    if st.button("💾 Guardar cambios"):
-        choferes_duplicados = edited_df["chófer"].dropna().duplicated().any()
-        matriculas_total = pd.concat([
-            edited_df["tractora"].dropna(),
-            edited_df["remolque"].dropna()
-        ])
-        matriculas_duplicadas = matriculas_total.duplicated().any()
-
-        if choferes_duplicados:
-            st.error("❌ No puede haber chóferes duplicados.")
-        elif matriculas_duplicadas:
-            st.error("❌ No puede haber matrículas de tractora o remolque duplicadas.")
-        else:
-            guardar_matriculas(edited_df)
-            st.success("Cambios guardados correctamente.")
 
     st.divider()
 

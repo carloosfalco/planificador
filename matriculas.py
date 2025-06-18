@@ -1,8 +1,11 @@
 import streamlit as st
 import pandas as pd
 import os
+from datetime import date
 
 CSV_FILE = "matriculas.csv"
+
+@st.cache_data
 
 def cargar_matriculas():
     if os.path.exists(CSV_FILE):
@@ -16,7 +19,13 @@ def guardar_matriculas(df):
 def matriculas():
     st.title("🚚 Gestión de Matrículas")
 
-    df = cargar_matriculas()
+    uploaded_file = st.file_uploader("📤 Subir archivo Excel de matrículas", type=["xlsx"])
+    if uploaded_file:
+        df = pd.read_excel(uploaded_file)
+        guardar_matriculas(df)
+        st.success("Archivo cargado correctamente y datos guardados en CSV.")
+    else:
+        df = cargar_matriculas()
 
     st.subheader("📋 Tabla de chóferes y vehículos")
     edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
@@ -49,11 +58,9 @@ def matriculas():
         errores = []
 
         if crear:
-            # Validar chofer duplicado si está definido
             if chofer and chofer in df["chófer"].dropna().values:
                 errores.append("Ya existe un chófer con ese nombre.")
 
-            # Validar duplicados de matrículas
             todas_matriculas = pd.concat([
                 df["tractora"].dropna(),
                 df["remolque"].dropna()
@@ -64,7 +71,6 @@ def matriculas():
             if remolque and remolque in todas_matriculas:
                 errores.append("La matrícula del remolque ya está registrada.")
 
-            # Al menos uno de los tres campos debe tener valor
             if not chofer and not tractora and not remolque:
                 errores.append("Debes rellenar al menos un campo.")
 
@@ -81,3 +87,20 @@ def matriculas():
                 guardar_matriculas(df)
                 st.success("Registro añadido correctamente.")
                 st.rerun()
+
+    st.divider()
+
+    st.subheader("📝 Registrar movimiento de matrículas")
+    with st.form("form_movimiento"):
+        fecha_mov = st.date_input("📅 Fecha", value=date.today())
+        chofer_mov = st.selectbox("👤 Chófer", options=[""] + df["chófer"].dropna().unique().tolist())
+        deja = st.text_input("🚛 Tractora/Remolque que deja")
+        coge = st.text_input("🚚 Tractora/Remolque que coge")
+        registrar = st.form_submit_button("Registrar movimiento")
+
+        if registrar:
+            st.success(f"Movimiento registrado:")
+            st.markdown(f"- Fecha: {fecha_mov.strftime('%d/%m/%Y')}")
+            st.markdown(f"- Chófer: {chofer_mov}")
+            st.markdown(f"- Deja: {deja}")
+            st.markdown(f"- Coge: {coge}")

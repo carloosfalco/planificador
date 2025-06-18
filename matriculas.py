@@ -2,33 +2,15 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import date
-import unidecode
-import re
 
 CSV_FILE = "matriculas.csv"
 CSV_MOVIMIENTOS = "movimientos.csv"
 
 @st.cache_data
-
 def cargar_matriculas():
     if os.path.exists(CSV_FILE):
         try:
-            df = pd.read_csv(CSV_FILE)
-            columnas = [unidecode.unidecode(col).strip().lower() for col in df.columns]
-            mapping = {}
-            for col in df.columns:
-                normalized = unidecode.unidecode(col).strip().lower()
-                if "chofer" in normalized:
-                    mapping[col] = "chófer"
-                elif "tractora" in normalized:
-                    mapping[col] = "tractora"
-                elif "remolque" in normalized:
-                    mapping[col] = "remolque"
-            df.rename(columns=mapping, inplace=True)
-            if "chófer" not in df.columns:
-                st.warning("El archivo de matrículas no contiene la columna 'chófer'. Se usará estructura vacía.")
-                return pd.DataFrame(columns=["chófer", "tractora", "remolque"])
-            return df
+            return pd.read_csv(CSV_FILE)
         except Exception as e:
             st.error(f"Error al leer el archivo: {e}")
             return pd.DataFrame(columns=["chófer", "tractora", "remolque"])
@@ -64,40 +46,12 @@ def matriculas():
 
     uploaded_file = st.file_uploader("📤 Subir archivo Excel de matrículas", type=["xlsx"])
     if uploaded_file:
-        df = pd.read_excel(uploaded_file)
-        columnas = [unidecode.unidecode(col).strip().lower() for col in df.columns]
-        mapping = {}
-        for col in df.columns:
-            normalized = unidecode.unidecode(col).strip().lower()
-            if "chofer" in normalized:
-                mapping[col] = "chófer"
-            elif "tractora" in normalized:
-                mapping[col] = "tractora"
-            elif "remolque" in normalized:
-                mapping[col] = "remolque"
-        df.rename(columns=mapping, inplace=True)
-
-        if "chófer" not in df.columns:
-            st.warning(f"El archivo subido tiene estas columnas: {df.columns.tolist()}")
-            st.warning("El archivo subido no tiene la columna 'chófer'. Se ignorará.")
-            df = pd.DataFrame(columns=["chófer", "tractora", "remolque"])
-        else:
-            df["chófer"] = df["chófer"].astype(str).str.strip().str.title()
-            if "tractora" in df.columns:
-                df["tractora"] = df["tractora"].astype(str).str.strip().str.upper()
-                invalid_tractora = df[~df["tractora"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
-                if not invalid_tractora.empty:
-                    st.warning(f"Estas tractoras tienen un formato inválido y serán descartadas: {invalid_tractora['tractora'].tolist()}")
-                df = df[df["tractora"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
-            if "remolque" in df.columns:
-                df["remolque"] = df["remolque"].astype(str).str.strip().str.upper()
-                invalid_remolque = df[~df["remolque"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
-                if not invalid_remolque.empty:
-                    st.warning(f"Estos remolques tienen un formato inválido y serán descartados: {invalid_remolque['remolque'].tolist()}")
-                df = df[df["remolque"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
-
-        guardar_matriculas(df)
-        st.success("Archivo cargado correctamente y datos guardados en CSV permanente.")
+        try:
+            df = pd.read_excel(uploaded_file)
+            guardar_matriculas(df)
+            st.success("Archivo cargado correctamente y datos guardados en CSV permanente.")
+        except Exception as e:
+            st.error(f"Error al procesar el archivo subido: {e}")
     else:
         df = cargar_matriculas()
 
@@ -105,20 +59,8 @@ def matriculas():
     edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
 
     if st.button("💾 Guardar cambios"):
-        choferes_duplicados = edited_df["chófer"].dropna().duplicated().any()
-        matriculas_total = pd.concat([
-            edited_df["tractora"].dropna(),
-            edited_df["remolque"].dropna()
-        ])
-        matriculas_duplicadas = matriculas_total.duplicated().any()
-
-        if choferes_duplicados:
-            st.error("❌ No puede haber chóferes duplicados.")
-        elif matriculas_duplicadas:
-            st.error("❌ No puede haber matrículas de tractora o remolque duplicadas.")
-        else:
-            guardar_matriculas(edited_df)
-            st.success("Cambios guardados correctamente.")
+        guardar_matriculas(edited_df)
+        st.success("Cambios guardados correctamente.")
 
     st.divider()
 
@@ -126,10 +68,9 @@ def matriculas():
     with st.form("form_movimiento"):
         fecha_mov = st.date_input("📅 Fecha", value=date.today())
         df = cargar_matriculas()
+        choferes_disponibles = [""]
         if "chófer" in df.columns:
-            choferes_disponibles = [""] + df["chófer"].dropna().unique().tolist()
-        else:
-            choferes_disponibles = [""]
+            choferes_disponibles += df["chófer"].dropna().unique().tolist()
 
         chofer_mov = st.selectbox("👤 Chófer", options=choferes_disponibles)
         deja = st.text_input("🚛 Tractora/Remolque que deja")
@@ -153,38 +94,16 @@ def matriculas():
         remolque = st.text_input("Matrícula remolque").strip()
         crear = st.form_submit_button("Añadir")
 
-        errores = []
-
         if crear:
-            if chofer and chofer in df["chófer"].dropna().values:
-                errores.append("Ya existe un chófer con ese nombre.")
-
-            todas_matriculas = pd.concat([
-                df["tractora"].dropna(),
-                df["remolque"].dropna()
-            ]).unique().tolist()
-
-            if tractora and tractora in todas_matriculas:
-                errores.append("La matrícula de la tractora ya está registrada.")
-            if remolque and remolque in todas_matriculas:
-                errores.append("La matrícula del remolque ya está registrada.")
-
-            if not chofer and not tractora and not remolque:
-                errores.append("Debes rellenar al menos un campo.")
-
-            if errores:
-                for err in errores:
-                    st.error(f"❌ {err}")
-            else:
-                nuevo = pd.DataFrame([{
-                    "chófer": chofer if chofer else None,
-                    "tractora": tractora if tractora else None,
-                    "remolque": remolque if remolque else None
-                }])
-                df = pd.concat([df, nuevo], ignore_index=True)
-                guardar_matriculas(df)
-                st.success("Registro añadido correctamente.")
-                st.rerun()
+            nuevo = pd.DataFrame([{
+                "chófer": chofer if chofer else None,
+                "tractora": tractora if tractora else None,
+                "remolque": remolque if remolque else None
+            }])
+            df = pd.concat([df, nuevo], ignore_index=True)
+            guardar_matriculas(df)
+            st.success("Registro añadido correctamente.")
+            st.rerun()
 
     st.divider()
 
@@ -200,3 +119,4 @@ def matriculas():
     st.subheader("🗑️ Eliminar archivo de matrículas")
     if st.button("❌ Eliminar archivo CSV de matrículas"):
         eliminar_csv_matriculas()
+

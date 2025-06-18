@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import date
+import unidecode
+import re
 
 CSV_FILE = "matriculas.csv"
 CSV_MOVIMIENTOS = "movimientos.csv"
@@ -52,11 +54,28 @@ def matriculas():
     uploaded_file = st.file_uploader("📤 Subir archivo Excel de matrículas", type=["xlsx"])
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
-        df.columns = df.columns.str.strip().str.lower()  # limpieza de nombres
+        df.columns = [unidecode.unidecode(col).strip().lower() for col in df.columns]
         df.rename(columns={"chofer": "chófer"}, inplace=True)
+
         if "chófer" not in df.columns:
+            st.warning(f"El archivo subido tiene estas columnas: {df.columns.tolist()}")
             st.warning("El archivo subido no tiene la columna 'chófer'. Se ignorará.")
             df = pd.DataFrame(columns=["chófer", "tractora", "remolque"])
+        else:
+            df["chófer"] = df["chófer"].astype(str).str.strip().str.title()
+            if "tractora" in df.columns:
+                df["tractora"] = df["tractora"].astype(str).str.strip().str.upper()
+                invalid_tractora = df[~df["tractora"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+                if not invalid_tractora.empty:
+                    st.warning(f"Estas tractoras tienen un formato inválido y serán descartadas: {invalid_tractora['tractora'].tolist()}")
+                df = df[df["tractora"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+            if "remolque" in df.columns:
+                df["remolque"] = df["remolque"].astype(str).str.strip().str.upper()
+                invalid_remolque = df[~df["remolque"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+                if not invalid_remolque.empty:
+                    st.warning(f"Estos remolques tienen un formato inválido y serán descartados: {invalid_remolque['remolque'].tolist()}")
+                df = df[df["remolque"].apply(lambda x: bool(re.match(r"^\d{4}[A-Z]{3}$", x)) or x == '')]
+
         guardar_matriculas(df)
         st.success("Archivo cargado correctamente y datos guardados en CSV permanente.")
     else:

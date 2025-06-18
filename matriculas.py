@@ -52,6 +52,8 @@ def matriculas():
     uploaded_file = st.file_uploader("📤 Subir archivo Excel de matrículas", type=["xlsx"])
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
+        df.columns = df.columns.str.strip().str.lower()  # limpieza de nombres
+        df.rename(columns={"chofer": "chófer"}, inplace=True)
         if "chófer" not in df.columns:
             st.warning("El archivo subido no tiene la columna 'chófer'. Se ignorará.")
             df = pd.DataFrame(columns=["chófer", "tractora", "remolque"])

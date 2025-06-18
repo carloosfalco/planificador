@@ -4,6 +4,7 @@ import os
 from datetime import date
 
 CSV_FILE = "matriculas.csv"
+CSV_MOVIMIENTOS = "movimientos.csv"
 
 @st.cache_data
 
@@ -15,6 +16,20 @@ def cargar_matriculas():
 
 def guardar_matriculas(df):
     df.to_csv(CSV_FILE, index=False)
+
+def guardar_movimiento(fecha, chofer, deja, coge):
+    movimiento = pd.DataFrame([{
+        "Fecha": fecha.strftime("%Y-%m-%d"),
+        "Chófer": chofer,
+        "Deja": deja,
+        "Coge": coge
+    }])
+    if os.path.exists(CSV_MOVIMIENTOS):
+        historial = pd.read_csv(CSV_MOVIMIENTOS)
+        historial = pd.concat([historial, movimiento], ignore_index=True)
+    else:
+        historial = movimiento
+    historial.to_csv(CSV_MOVIMIENTOS, index=False)
 
 def matriculas():
     st.title("🚚 Gestión de Matrículas")
@@ -99,6 +114,7 @@ def matriculas():
         registrar = st.form_submit_button("Registrar movimiento")
 
         if registrar:
+            guardar_movimiento(fecha_mov, chofer_mov, deja, coge)
             st.success(f"Movimiento registrado:")
             st.markdown(f"- Fecha: {fecha_mov.strftime('%d/%m/%Y')}")
             st.markdown(f"- Chófer: {chofer_mov}")

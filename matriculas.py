@@ -39,6 +39,13 @@ def guardar_movimiento(fecha, chofer, deja, coge):
         historial = movimiento
     historial.to_csv(CSV_MOVIMIENTOS, index=False)
 
+def eliminar_csv_matriculas():
+    if os.path.exists(CSV_FILE):
+        os.remove(CSV_FILE)
+        st.success("Archivo de matrículas eliminado correctamente.")
+    else:
+        st.info("No hay archivo de matrículas que eliminar.")
+
 def matriculas():
     st.title("🚚 Gestión de Matrículas")
 
@@ -46,9 +53,33 @@ def matriculas():
     if uploaded_file:
         df = pd.read_excel(uploaded_file)
         guardar_matriculas(df)
-        st.success("Archivo cargado correctamente y datos guardados en CSV.")
+        st.success("Archivo cargado correctamente y datos guardados en CSV permanente.")
     else:
         df = cargar_matriculas()
+
+    st.subheader("📝 Registrar movimiento de matrículas")
+    with st.form("form_movimiento"):
+        fecha_mov = st.date_input("📅 Fecha", value=date.today())
+        df = cargar_matriculas()
+        if "chófer" in df.columns:
+            choferes_disponibles = [""] + df["chófer"].dropna().unique().tolist()
+        else:
+            choferes_disponibles = [""]
+
+        chofer_mov = st.selectbox("👤 Chófer", options=choferes_disponibles)
+        deja = st.text_input("🚛 Tractora/Remolque que deja")
+        coge = st.text_input("🚚 Tractora/Remolque que coge")
+        registrar = st.form_submit_button("Registrar movimiento")
+
+        if registrar:
+            guardar_movimiento(fecha_mov, chofer_mov, deja, coge)
+            st.success(f"Movimiento registrado:")
+            st.markdown(f"- Fecha: {fecha_mov.strftime('%d/%m/%Y')}")
+            st.markdown(f"- Chófer: {chofer_mov}")
+            st.markdown(f"- Deja: {deja}")
+            st.markdown(f"- Coge: {coge}")
+
+    st.divider()
 
     st.subheader("📋 Tabla de chóferes y vehículos")
     edited_df = st.data_editor(df, num_rows="dynamic", use_container_width=True)
@@ -113,23 +144,15 @@ def matriculas():
 
     st.divider()
 
-    st.subheader("📝 Registrar movimiento de matrículas")
-    with st.form("form_movimiento"):
-        fecha_mov = st.date_input("📅 Fecha", value=date.today())
-        if "chófer" in df.columns:
-            choferes_disponibles = [""] + df["chófer"].dropna().unique().tolist()
-        else:
-            choferes_disponibles = [""]
+    if os.path.exists(CSV_MOVIMIENTOS):
+        st.subheader("📑 Historial de movimientos registrados")
+        historial_df = pd.read_csv(CSV_MOVIMIENTOS)
+        st.dataframe(historial_df, use_container_width=True)
+    else:
+        st.info("Aún no se han registrado movimientos.")
 
-        chofer_mov = st.selectbox("👤 Chófer", options=choferes_disponibles)
-        deja = st.text_input("🚛 Tractora/Remolque que deja")
-        coge = st.text_input("🚚 Tractora/Remolque que coge")
-        registrar = st.form_submit_button("Registrar movimiento")
+    st.divider()
 
-        if registrar:
-            guardar_movimiento(fecha_mov, chofer_mov, deja, coge)
-            st.success(f"Movimiento registrado:")
-            st.markdown(f"- Fecha: {fecha_mov.strftime('%d/%m/%Y')}")
-            st.markdown(f"- Chófer: {chofer_mov}")
-            st.markdown(f"- Deja: {deja}")
-            st.markdown(f"- Coge: {coge}")
+    st.subheader("🗑️ Eliminar archivo de matrículas")
+    if st.button("❌ Eliminar archivo CSV de matrículas"):
+        eliminar_csv_matriculas()

@@ -10,5 +10,5 @@ pandas
 openai
 transformers
 streamlit-calendar
-unicode
+unidecode
 

@@ -49,7 +49,16 @@ def matriculas():
     st.subheader("📋 Choferes y Asignaciones")
     df_choferes = cargar_csv(CSV_CHOFERES, [
         "chófer", "tractora", "marca", "remolque", "tipo_remolque", "jefe_trafico"])
-    edited_choferes = st.data_editor(df_choferes, num_rows="dynamic", use_container_width=True)
+    marcas_posibles = ["DAF", "FORD", "MAN", "MERCEDES", "SCANIA", "VOLVO"]
+    jefes_trafico = [
+        "TAMARA", "ANA", "ALVARO", "PATRICIA", "CRISTOFER", "DAVID",
+        "FERMIN", "RAUL", "CESAR", "CARMELO", "PABLO", "JULIO", "GIUSEPPE", "CESAR"]
+
+    edited_choferes = st.data_editor(df_choferes, num_rows="dynamic", use_container_width=True,
+        column_config={
+            "marca": st.column_config.SelectboxColumn("Marca", options=marcas_posibles),
+            "jefe_trafico": st.column_config.SelectboxColumn("Jefe de tráfico", options=jefes_trafico)
+        })
 
     if st.button("💾 Guardar choferes y asignaciones"):
         guardar_csv(edited_choferes, CSV_CHOFERES)
@@ -64,7 +73,7 @@ def matriculas():
         choferes_disponibles = df["chófer"].dropna().unique().tolist()
         chofer = st.selectbox("👤 Chófer", options=choferes_disponibles)
         tractora_nueva = st.text_input("🚛 Nueva tractora")
-        marca_nueva = st.text_input("🏷️ Marca tractora")
+        marca_actual = df[df["chófer"] == chofer]["marca"].values[0] if chofer in df["chófer"].values else ""
         remolque_nuevo = st.text_input("🚚 Nuevo remolque")
         tipo_remolque = st.selectbox("📦 Tipo de remolque", options=["", "Lona", "Frigo"])
         registrar = st.form_submit_button("Registrar cambio")
@@ -72,9 +81,8 @@ def matriculas():
         if registrar:
             idx = df[df["chófer"] == chofer].index[0]
             jefe = df.loc[idx, "jefe_trafico"]
-            guardar_movimiento(fecha, chofer, tractora_nueva, marca_nueva, remolque_nuevo, tipo_remolque, jefe)
+            guardar_movimiento(fecha, chofer, tractora_nueva, marca_actual, remolque_nuevo, tipo_remolque, jefe)
             df.at[idx, "tractora"] = tractora_nueva
-            df.at[idx, "marca"] = marca_nueva
             df.at[idx, "remolque"] = remolque_nuevo
             df.at[idx, "tipo_remolque"] = tipo_remolque
             guardar_csv(df, CSV_CHOFERES)
@@ -112,4 +120,3 @@ def matriculas():
         eliminar_csv(CSV_CHOFERES)
     if st.button("❌ Eliminar archivo CSV de movimientos"):
         eliminar_csv(CSV_MOVIMIENTOS)
-
